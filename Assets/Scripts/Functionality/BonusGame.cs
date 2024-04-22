@@ -110,6 +110,8 @@ public class BonusGame : MonoBehaviour
     [SerializeField] private List<int> leftList;
     [SerializeField] private List<int> upList;
     [SerializeField] private List<GameObject> OuterReeAllItem;
+    [SerializeField] private GameObject lighting;
+    private bool ison = true;
 
     private void Start()
     {
@@ -121,6 +123,8 @@ public class BonusGame : MonoBehaviour
         PopulateInitalSlots(1, InitalizeList);
         PopulateInitalSlots(2, InitalizeList);
         PopulateOuterReel();
+
+        InvokeRepeating("ToggleOnOff", 0.1f, 0.2f);
     }
 
 
@@ -404,6 +408,12 @@ public class BonusGame : MonoBehaviour
         {
             OuterReeAllItem.Add(OuterReelSlots[1].GetChild(i).gameObject);
         }
+
+    }
+
+    void ToggleOnOff() {
+        ison=!ison;
+        lighting.SetActive(ison);
 
     }
 
