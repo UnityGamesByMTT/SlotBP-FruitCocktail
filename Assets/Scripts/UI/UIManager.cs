@@ -90,6 +90,7 @@ public class UIManager : MonoBehaviour
     private bool isMusic = true;
     private bool isSound = true;
 
+    [SerializeField] private AudioController audioController;
 
     private void Start()
     {
@@ -140,6 +141,8 @@ public class UIManager : MonoBehaviour
 
     private void OpenMenu()
     {
+        if (audioController) audioController.PlayButtonAudio();
+
         if (Menu_Object) Menu_Object.SetActive(false);
         if (Exit_Object) Exit_Object.SetActive(true);
         if (About_Object) About_Object.SetActive(true);
@@ -164,6 +167,7 @@ public class UIManager : MonoBehaviour
 
     private void CloseMenu()
     {
+        if (audioController) audioController.PlayButtonAudio();
 
         DOTween.To(() => About_RT.anchoredPosition, (val) => About_RT.anchoredPosition = val, new Vector2(About_RT.anchoredPosition.x, About_RT.anchoredPosition.y - 150), 0.1f).OnUpdate(() =>
         {
@@ -192,12 +196,16 @@ public class UIManager : MonoBehaviour
 
     private void OpenPopup(GameObject Popup)
     {
+        if (audioController) audioController.PlayButtonAudio();
+
         if (Popup) Popup.SetActive(true);
         if (MainPopup_Object) MainPopup_Object.SetActive(true);
     }
 
     private void ClosePopup(GameObject Popup)
     {
+        if (audioController) audioController.PlayButtonAudio();
+
         if (Popup) Popup.SetActive(false);
         if (MainPopup_Object) MainPopup_Object.SetActive(false);
     }
@@ -209,13 +217,16 @@ public class UIManager : MonoBehaviour
         {
             if (MusicOn_Object) MusicOn_Object.SetActive(true);
             if (MusicOff_Object) MusicOff_Object.SetActive(false);
-            if (BG_Sounds) BG_Sounds.mute = false;
+            if (audioController) audioController.ToggleMute(false,"bg");
+
+            //if (BG_Sounds) BG_Sounds.mute = false;
         }
         else
         {
             if (MusicOn_Object) MusicOn_Object.SetActive(false);
             if (MusicOff_Object) MusicOff_Object.SetActive(true);
-            if (BG_Sounds) BG_Sounds.mute = true;
+            if (audioController) audioController.ToggleMute(true, "bg");
+            //if (BG_Sounds) BG_Sounds.mute = true;
         }
     }
 
@@ -226,15 +237,20 @@ public class UIManager : MonoBehaviour
         {
             if (SoundOn_Object) SoundOn_Object.SetActive(true);
             if (SoundOff_Object) SoundOff_Object.SetActive(false);
-            if (Spin_Sounds) Spin_Sounds.mute = false;
-            if (Button_Sounds) Button_Sounds.mute = false;
+            if (audioController) audioController.ToggleMute(false, "wl");
+            if (audioController) audioController.ToggleMute(false, "button");
+            //if (Spin_Sounds) Spin_Sounds.mute = false;
+            //if (Button_Sounds) Button_Sounds.mute = false;
         }
         else
         {
             if (SoundOn_Object) SoundOn_Object.SetActive(false);
             if (SoundOff_Object) SoundOff_Object.SetActive(true);
-            if (Spin_Sounds) Spin_Sounds.mute = true;
-            if (Button_Sounds) Button_Sounds.mute = true;
+
+            if (audioController) audioController.ToggleMute(true, "wl");
+            if (audioController) audioController.ToggleMute(true, "button");
+            //if (Spin_Sounds) Spin_Sounds.mute = true;
+            //if (Button_Sounds) Button_Sounds.mute = true;
         }
     }
 }

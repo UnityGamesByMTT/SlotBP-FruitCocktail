@@ -99,6 +99,9 @@ public class SlotBehaviour : MonoBehaviour
     private Button LineMinus_Button;
 
     [Header("Audio Management")]
+
+    [SerializeField] private AudioController audioController;
+
     [SerializeField]
     private AudioSource _audioSource;
     [SerializeField]
@@ -273,6 +276,7 @@ public class SlotBehaviour : MonoBehaviour
 
     private void ChangeBet(bool IncDec)
     {
+        if (audioController) audioController.PlayButtonAudio();
         double currentbet = 0;
         try
         {
@@ -367,13 +371,6 @@ public class SlotBehaviour : MonoBehaviour
     {
         switch (val)
         {
-            //case 0:
-            //    for (int i = 0; i < Bonus_Sprite.Length; i++)
-            //    {
-            //        animScript.textureArray.Add(Bonus_Sprite[i]);
-            //    }
-            //    animScript.AnimationSpeed = 30f;
-            //    break;
             case 0:
                 for (int i = 0; i < Apple_sprite.Length; i++)
                 {
@@ -442,31 +439,21 @@ public class SlotBehaviour : MonoBehaviour
                     animScript.textureArray.Add(Watermelon_Sprite[i]);
                 }
                 break;
-            //case 12:
-            //    for (int i = 0; i < Scatter_Sprite.Length; i++)
-            //    {
-            //        animScript.textureArray.Add(Scatter_Sprite[i]);
-            //    }
-            //    animScript.AnimationSpeed = 30f;
-            //    break;
-            //case 13:
-            //    for (int i = 0; i < Wild_Sprite.Length; i++)
-            //    {
-            //        animScript.textureArray.Add(Wild_Sprite[i]);
-            //    }
-            //    animScript.AnimationSpeed = 30f;
-            //    break;
+
         }
     }
 
     //starts the spin process
     private void StartSlots(bool autoSpin = false)
     {
-        if (_audioSource) _audioSource.clip = _spinSound;
-        if (_audioSource) _audioSource.loop = true;
-        if (_audioSource) _audioSource.Play();
+        //if (_audioSource) _audioSource.clip = _spinSound;
+        //if (_audioSource) _audioSource.loop = true;
+        //if (_audioSource) _audioSource.Play();
 
-        if(charecter_idle) charecter_idle.SetActive(true);
+        if (audioController) audioController.PlayWLAudio("spin");
+
+
+        if (charecter_idle) charecter_idle.SetActive(true);
         if(charecter_happy) charecter_happy.SetActive(false);
 
         if(!autoSpin)
@@ -551,11 +538,12 @@ public class SlotBehaviour : MonoBehaviour
             if (charecter_idle) charecter_idle.SetActive(false);
             if (charecter_happy) charecter_happy.SetActive(true);
 
-            int choice = UnityEngine.Random.Range(0, 2);
-            if (_audioSource) _audioSource.Stop();
-            if (_audioSource) _audioSource.loop = false;
-            if (_audioSource) _audioSource.clip = _winSounds[choice];
-            if (_audioSource) _audioSource.Play();
+            //int choice = UnityEngine.Random.Range(0, 2);
+            //if (_audioSource) _audioSource.Stop();
+            //if (_audioSource) _audioSource.loop = false;
+            //if (_audioSource) _audioSource.clip = _winSounds[choice];
+            //if (_audioSource) _audioSource.Play();
+            if (audioController) audioController.PlayWLAudio("win");
 
             for (int i = 0; i < LineId.Count; i++)
             {
@@ -577,10 +565,12 @@ public class SlotBehaviour : MonoBehaviour
         }
         else
         {
-            if (_audioSource) _audioSource.Stop();
-            if (_audioSource) _audioSource.loop = false;
-            if (_audioSource) _audioSource.clip = _lossSound;
-            if (_audioSource) _audioSource.Play();
+            if (audioController) audioController.PlayWLAudio("lose");
+
+            //if (_audioSource) _audioSource.Stop();
+            //if (_audioSource) _audioSource.loop = false;
+            //if (_audioSource) _audioSource.clip = _lossSound;
+            //if (_audioSource) _audioSource.Play();
 
             if (charecter_idle) charecter_idle.SetActive(true);
             if (charecter_happy) charecter_happy.SetActive(false);

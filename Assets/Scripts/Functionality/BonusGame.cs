@@ -97,12 +97,7 @@ public class BonusGame : MonoBehaviour
     private SocketIOManager SocketManager;
 
     [SerializeField] private List<int> InitalizeList = new List<int>();
-    [SerializeField] private List<int> Stoppositions = new List<int>();
 
-    [SerializeField] private Transform Border;
-    [SerializeField] private float X_distance;
-    [SerializeField] private float Y_distance;
-    private int currentIndex;
     [SerializeField] private int stopIndex;
     [SerializeField] private List<Sprite> OuterReelSpriteList;
     [SerializeField] private List<Transform> OuterReelSlots;
@@ -448,16 +443,6 @@ public class BonusGame : MonoBehaviour
     }
 
 
-
-    //void MoveBorder()
-    //{
-
-
-    //    StartCoroutine(MoveSelectorLoop());
-
-
-    //}
-
     IEnumerator MoveSelector()
     {
 
@@ -478,6 +463,7 @@ public class BonusGame : MonoBehaviour
 
         for (int i = 0; i < OuterReeAllItem.Count; i++)
         {
+
             if (i == stop_index)
             {
 
@@ -494,124 +480,6 @@ public class BonusGame : MonoBehaviour
         }
 
     }
-
-
-    //IEnumerator MoveSelectorLoop(int loop = 2)
-    //{
-    //    int x_direction = 1;
-    //    int y_direction = -1;
-
-    //    for (int i = 0; i < loop * 2; i++)
-    //    {
-
-    //        if (currentIndex > 25)
-    //            currentIndex = 0;
-
-    //        if (i >= (loop - 1) * 2)
-    //        {
-
-    //            yield return StartCoroutine(MoveSelectorXY(x_direction, y_direction, stopIndex));
-    //            x_direction = x_direction * -1;
-    //            y_direction = y_direction * -1;
-    //        }
-    //        else
-    //        {
-    //            yield return StartCoroutine(MoveSelectorXY(x_direction, y_direction));
-    //            x_direction = x_direction * -1;
-    //            y_direction = y_direction * -1;
-
-    //        }
-
-
-    //    }
-    //}
-
-    //IEnumerator MoveSelectorXY(int x_direction, int y_direction, int stop_index = -1)
-    //{
-
-    //    bool move_x = false;
-    //    bool move_y = false;
-    //    int max_x = 7;
-    //    int max_y = 6;
-
-    //    if (currentIndex >= 0 && currentIndex < 7)
-    //    {
-    //        move_x = true;
-    //        max_x = 7 - currentIndex;
-
-    //    }
-    //    if (currentIndex >= 13 && currentIndex < 20)
-    //    {
-    //        move_x = true;
-    //        max_x = 20 - currentIndex;
-    //    }
-
-
-    //    if ((currentIndex >= 7 && currentIndex < 13))
-    //    {
-    //        move_y = true;
-    //        max_y = 13 - currentIndex;
-    //    }
-
-    //    if (currentIndex >= 20 && currentIndex < 25)
-    //    {
-
-    //        move_y = true;
-    //        max_y = 25 - currentIndex;
-
-    //    }
-
-    //    if (currentIndex == 25)
-    //        max_y = 1;
-    //    //if (currentIndex == 0)
-    //    //    max_y = 1;
-
-    //    if (move_x)
-    //    {
-
-    //        for (int i = 0; i < max_x; i++)
-    //        {
-    //            if (currentIndex >= stop_index && stop_index >= 0)
-    //            {
-    //                Tweener tweener = Border.DOLocalMoveX(Border.localPosition.x + X_distance * x_direction, 0.1f);
-    //                tweener.Kill();
-    //                yield break;
-    //            }
-    //            Border.DOLocalMoveX(Border.localPosition.x + X_distance * x_direction, 0.1f);
-    //            yield return new WaitForSeconds(0.1f);
-
-    //            currentIndex++;
-
-    //        }
-    //        move_y = true;
-    //        move_x = false;
-
-    //    }
-
-    //    if (move_y)
-    //    {
-    //        for (int i = 0; i < max_y; i++)
-    //        {
-    //            if (currentIndex >= stop_index && stop_index >= 0)
-    //            {
-
-    //                Tweener tweener = Border.DOLocalMoveY(Border.localPosition.y + Y_distance * y_direction, 0.1f);
-    //                tweener.Kill();
-    //                yield break;
-    //            }
-    //            Border.DOLocalMoveY(Border.localPosition.y + Y_distance * y_direction, 0.1f);
-    //            yield return new WaitForSeconds(0.1f);
-    //            currentIndex++;
-
-    //        }
-    //        move_x = true;
-    //        move_y = false;
-    //    }
-
-
-    //}
-
-
     #endregion
 }
 
