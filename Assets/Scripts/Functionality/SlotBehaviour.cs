@@ -82,10 +82,6 @@ public class SlotBehaviour : MonoBehaviour
     [SerializeField]
     private Button AutoSpin_Button;
     [SerializeField]
-    private Sprite AutoSpinHover_Sprite;
-    [SerializeField]
-    private Sprite AutoSpin_Sprite;
-    [SerializeField]
     private Image AutoSpin_Image;
     [SerializeField]
     private Button MaxBet_Button;
@@ -170,6 +166,7 @@ public class SlotBehaviour : MonoBehaviour
         if(IsAutoSpin)
         {
             //if (AutoSpin_Image) AutoSpin_Image.sprite = AutoSpinHover_Sprite;
+            if (AutoSpin_Image) AutoSpin_Image.color = new Color32(160, 160, 160, 255);
             if(AutoSpinRoutine != null)
             {
                 StopCoroutine(AutoSpinRoutine);
@@ -179,7 +176,10 @@ public class SlotBehaviour : MonoBehaviour
         }
         else
         {
-            if (AutoSpin_Image) AutoSpin_Image.sprite = AutoSpin_Sprite;
+            //if (AutoSpin_Image) AutoSpin_Image.sprite = AutoSpin_Sprite;
+            if (AutoSpin_Image) AutoSpin_Image.color = new Color32(255, 255, 255, 255);
+            if (!SlotStart_Button.interactable) SlotStart_Button.interactable = true;
+
             if (AutoSpinRoutine != null)
             {
                 StopCoroutine(AutoSpinRoutine);
@@ -193,7 +193,7 @@ public class SlotBehaviour : MonoBehaviour
         while(true)
         {
             StartSlots(true);
-            yield return new WaitForSeconds(10);
+            yield return new WaitForSeconds(5);
         }
     }
 
@@ -504,6 +504,7 @@ public class SlotBehaviour : MonoBehaviour
         GenerateMatrix(SocketManager.tempresult.StopList);
         CheckPayoutLineBackend(SocketManager.tempresult.resultLine, SocketManager.tempresult.x_animResult, SocketManager.tempresult.y_animResult);
         KillAllTweens();
+        if(!IsAutoSpin)
         if (SlotStart_Button) SlotStart_Button.interactable = true;
         if (AutoSpin_Button) AutoSpin_Button.interactable = true;
 

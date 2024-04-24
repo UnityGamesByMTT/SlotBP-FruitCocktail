@@ -13,6 +13,7 @@ public class AudioController : MonoBehaviour
 
     private void Start()
     {
+        if (bg_adudio) bg_adudio.Play();
         audioPlayer_button.clip = clips[clips.Length-1];
     }
 
@@ -37,6 +38,24 @@ public class AudioController : MonoBehaviour
         audioPlayer_wl.loop = true;
         audioPlayer_wl.Play();
 
+    }
+
+    private void OnApplicationFocus(bool focus)
+    {
+        if (!focus)
+        {
+
+            bg_adudio.Pause();
+            audioPlayer_wl.Pause();
+            audioPlayer_button.Pause();
+        }
+        else
+        {
+            if (!bg_adudio.mute) bg_adudio.Play();
+            if (!audioPlayer_wl.mute) audioPlayer_wl.Play();
+            if (!audioPlayer_button.mute) audioPlayer_button.Play();
+
+        }
     }
 
     internal void PlayButtonAudio() {
