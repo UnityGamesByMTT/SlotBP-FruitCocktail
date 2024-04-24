@@ -426,8 +426,8 @@ public class BonusGame : MonoBehaviour
     private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index)
     {
         alltweens[index].Pause();
-        int tweenpos = 230 + ((reqpos - 1) * IconSizeFactor);
-        alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos + 115, 0.5f).SetEase(Ease.OutElastic);
+        int tweenpos = (reqpos  * IconSizeFactor);
+        alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos+115 , 0.5f).SetEase(Ease.OutElastic);
         yield return new WaitForSeconds(0.2f);
     }
 
