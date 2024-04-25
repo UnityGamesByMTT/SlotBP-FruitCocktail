@@ -178,7 +178,9 @@ public class SlotBehaviour : MonoBehaviour
         {
             //if (AutoSpin_Image) AutoSpin_Image.sprite = AutoSpin_Sprite;
             if (AutoSpin_Image) AutoSpin_Image.color = new Color32(255, 255, 255, 255);
-            if (!SlotStart_Button.interactable) SlotStart_Button.interactable = true;
+            if (SlotStart_Button) SlotStart_Button.interactable = true;
+            if (BetMinus_Button) BetMinus_Button.interactable = true;
+            if (BetPlus_Button) BetPlus_Button.interactable = true;
 
             if (AutoSpinRoutine != null)
             {
@@ -485,6 +487,8 @@ public class SlotBehaviour : MonoBehaviour
     {
         if (SlotStart_Button) SlotStart_Button.interactable = false;
         if (AutoSpin_Button) AutoSpin_Button.interactable = false;
+        if (BetMinus_Button) BetMinus_Button.interactable = false;
+        if (BetPlus_Button) BetPlus_Button.interactable = false;
         for (int i = 0; i < numberOfSlots; i++)
         {
             InitializeTweening(Slot_Transform[i]);
@@ -504,8 +508,11 @@ public class SlotBehaviour : MonoBehaviour
         GenerateMatrix(SocketManager.tempresult.StopList);
         CheckPayoutLineBackend(SocketManager.tempresult.resultLine, SocketManager.tempresult.x_animResult, SocketManager.tempresult.y_animResult);
         KillAllTweens();
-        if(!IsAutoSpin)
+        if (!IsAutoSpin) {
         if (SlotStart_Button) SlotStart_Button.interactable = true;
+        if (BetMinus_Button) BetMinus_Button.interactable = true;
+        if (BetPlus_Button) BetPlus_Button.interactable = true;
+        }
         if (AutoSpin_Button) AutoSpin_Button.interactable = true;
 
     }

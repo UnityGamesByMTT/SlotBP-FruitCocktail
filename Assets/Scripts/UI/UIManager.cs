@@ -58,10 +58,12 @@ public class UIManager : MonoBehaviour
     private Button AboutExit_Button;
 
     [Header("Paytable Popup")]
-    [SerializeField]
-    private GameObject PaytablePopup_Object;
-    [SerializeField]
-    private Button PaytableExit_Button;
+    [SerializeField] private GameObject PaytablePopup_Object;
+    [SerializeField] private Button PaytableExit_Button;
+    [SerializeField] private Button Left_Arrow;
+    [SerializeField] private Button Right_Arrow;
+    [SerializeField] private GameObject[] paytableList;
+    [SerializeField] private int CurrentIndex = 0;
 
     [Header("Settings Popup")]
     [SerializeField]
@@ -124,9 +126,14 @@ public class UIManager : MonoBehaviour
         if (SoundOn_Object) SoundOn_Object.SetActive(true);
         if (SoundOff_Object) SoundOff_Object.SetActive(false);
 
-        if (BG_Sounds) BG_Sounds.mute = false;
-        if (Spin_Sounds) Spin_Sounds.mute = false;
-        if (Button_Sounds) Button_Sounds.mute = false;
+        //if (BG_Sounds) BG_Sounds.mute = false;
+        //if (Spin_Sounds) Spin_Sounds.mute = false;
+        //if (Button_Sounds) Button_Sounds.mute = false;
+        if (Left_Arrow) Left_Arrow.onClick.RemoveAllListeners();
+        if (Left_Arrow) Left_Arrow.onClick.AddListener(delegate { slide(-1); });
+
+        if (Right_Arrow) Right_Arrow.onClick.RemoveAllListeners();
+        if (Right_Arrow) Right_Arrow.onClick.AddListener(delegate { slide(1); });
 
         isMusic = true;
         isSound = true;
@@ -228,6 +235,27 @@ public class UIManager : MonoBehaviour
             if (audioController) audioController.ToggleMute(true, "bg");
             //if (BG_Sounds) BG_Sounds.mute = true;
         }
+    }
+
+    private void slide(int i)
+    {
+        if (audioController) audioController.PlayButtonAudio();
+
+        if (CurrentIndex < paytableList.Length - 1 && i > 0)
+        {
+            paytableList[CurrentIndex].SetActive(false);
+            paytableList[CurrentIndex + 1].SetActive(true);
+            CurrentIndex++;
+        }
+
+        if (CurrentIndex >= 1 && i < 0)
+        {
+            paytableList[CurrentIndex].SetActive(false);
+            paytableList[CurrentIndex - 1].SetActive(true);
+            CurrentIndex--;
+        }
+
+
     }
 
     private void ToggleSound()

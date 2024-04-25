@@ -95,3 +95,7 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 12
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}

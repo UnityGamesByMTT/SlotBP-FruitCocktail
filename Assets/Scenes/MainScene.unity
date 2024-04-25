@@ -557,9 +557,9 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1485219722}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -528.9}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 11.099976}
   m_SizeDelta: {x: 1135.68, y: 684.45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &21776336
@@ -3693,7 +3693,7 @@ GameObject:
   - component: {fileID: 248008049}
   - component: {fileID: 248008048}
   m_Layer: 5
-  m_Name: Button
+  m_Name: right_button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5105,6 +5105,12 @@ MonoBehaviour:
   AboutExit_Button: {fileID: 1501538279}
   PaytablePopup_Object: {fileID: 1023456358}
   PaytableExit_Button: {fileID: 990849630}
+  Left_Arrow: {fileID: 691714915}
+  Right_Arrow: {fileID: 248008048}
+  paytableList:
+  - {fileID: 1059169710}
+  - {fileID: 384395038}
+  CurrentIndex: 0
   SettingsPopup_Object: {fileID: 103253977}
   SettingsExit_Button: {fileID: 1398599432}
   Sound_Button: {fileID: 377509777}
@@ -5116,7 +5122,7 @@ MonoBehaviour:
   MusicOff_Object: {fileID: 1536590882}
   SoundOn_Object: {fileID: 1531986588}
   SoundOff_Object: {fileID: 881354683}
-  audioController: {fileID: 0}
+  audioController: {fileID: 2217360425959154902}
 --- !u!1 &378395632
 GameObject:
   m_ObjectHideFlags: 0
@@ -5208,7 +5214,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &384395039
 RectTransform:
   m_ObjectHideFlags: 0
@@ -8788,7 +8794,7 @@ GameObject:
   - component: {fileID: 691714916}
   - component: {fileID: 691714915}
   m_Layer: 5
-  m_Name: Button (1)
+  m_Name: left_button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26871,17 +26877,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainContainer_RT: {fileID: 1574897783}
   myImages:
-  - {fileID: 21300000, guid: 54fbe33353f124043a41766cd57c0160, type: 3}
-  - {fileID: 21300000, guid: 40ab7e3d0c8bb4fa6b20564b294c428c, type: 3}
-  - {fileID: 21300000, guid: 8b0a2e12119c5451997b7f0f18124d2a, type: 3}
-  - {fileID: 21300000, guid: 45487d73c51fc4bbea17fe0edd1a1ff6, type: 3}
-  - {fileID: 21300000, guid: e3bf582e44296483f96d65709f8934a7, type: 3}
-  - {fileID: 21300000, guid: 44b5e4362583b4cf7b4e16665719529b, type: 3}
-  - {fileID: 21300000, guid: 00210972b2c464b8c876a829e57576e6, type: 3}
-  - {fileID: 21300000, guid: 814e649d18c904ff7b660fe6aeb6c5ef, type: 3}
-  - {fileID: 21300000, guid: bb74de13e15b049a09ec4323194cc12e, type: 3}
+  - {fileID: 21300000, guid: 020d8b80089d847f0b578af555b4086e, type: 3}
+  - {fileID: 21300000, guid: bdfbcd9395bac441884c2675fee9d5d6, type: 3}
+  - {fileID: 21300000, guid: 10f0b55314856432da60f9cd887b9e75, type: 3}
+  - {fileID: 21300000, guid: 3dc744ae9b44b4752ac50390fb09ea84, type: 3}
+  - {fileID: 21300000, guid: 23dee63e9b95b487f88f62d15f3f48a8, type: 3}
+  - {fileID: 21300000, guid: f003109fde3fd420e9631117e1efc92a, type: 3}
+  - {fileID: 21300000, guid: dcb20c863506c49eabeb9343e354d79f, type: 3}
+  - {fileID: 21300000, guid: 11e6130b8361040bfba57ffd5de77665, type: 3}
+  - {fileID: 21300000, guid: 49cce7efc9dfd4377a04ad83d3c62b35, type: 3}
   - {fileID: 21300000, guid: e5824514121244db8b81aff503e8ea15, type: 3}
-  - {fileID: 21300000, guid: 024e3247e336441b29cb0eb48f9bad5a, type: 3}
+  - {fileID: 21300000, guid: c4f641c9d49ea466c8c1e0e678d7537b, type: 3}
   images:
   - slotImages: []
   - slotImages: []
