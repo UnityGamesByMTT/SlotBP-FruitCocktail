@@ -39,6 +39,19 @@ public class SlotBehaviour : MonoBehaviour
     [Header("Buttons")]
     [SerializeField]
     private Button SlotStart_Button;
+    [SerializeField] private Button AutoSpinStop_Button;
+    [SerializeField]
+    private Button AutoSpin_Button;
+    [SerializeField]
+    private Button MaxBet_Button;
+    [SerializeField]
+    private Button BetPlus_Button;
+    [SerializeField]
+    private Button BetMinus_Button;
+    [SerializeField]
+    private Button LinePlus_Button;
+    [SerializeField]
+    private Button LineMinus_Button;
 
     [Header("Animated Sprites")]
     //[SerializeField]
@@ -65,10 +78,7 @@ public class SlotBehaviour : MonoBehaviour
     private Sprite[] Strawberry_Sprite;
     [SerializeField]
     private Sprite[] Watermelon_Sprite;
-    //[SerializeField]
-    //private Sprite[] Scatter_Sprite;
-    //[SerializeField]
-    //private Sprite[] Wild_Sprite;
+
 
     [Header("Miscellaneous UI")]
     [SerializeField]
@@ -79,33 +89,21 @@ public class SlotBehaviour : MonoBehaviour
     private TMP_Text Lines_text;
     [SerializeField]
     private TMP_Text TotalWin_text;
-    [SerializeField]
-    private Button AutoSpin_Button;
-    [SerializeField]
-    private Image AutoSpin_Image;
-    [SerializeField]
-    private Button MaxBet_Button;
-    [SerializeField]
-    private Button BetPlus_Button;
-    [SerializeField]
-    private Button BetMinus_Button;
-    [SerializeField]
-    private Button LinePlus_Button;
-    [SerializeField]
-    private Button LineMinus_Button;
+
+
 
     [Header("Audio Management")]
 
     [SerializeField] private AudioController audioController;
 
-    [SerializeField]
-    private AudioSource _audioSource;
-    [SerializeField]
-    private AudioClip _spinSound;
-    [SerializeField]
-    private AudioClip _lossSound;
-    [SerializeField]
-    private AudioClip[] _winSounds;
+    //[SerializeField]
+    //private AudioSource _audioSource;
+    //[SerializeField]
+    //private AudioClip _spinSound;
+    //[SerializeField]
+    //private AudioClip _lossSound;
+    //[SerializeField]
+    //private AudioClip[] _winSounds;
 
     int tweenHeight = 0;  //calculate the height at which tweening is done
 
@@ -131,11 +129,15 @@ public class SlotBehaviour : MonoBehaviour
 
     [SerializeField]
     private SocketIOManager SocketManager;
-    Coroutine AutoSpinRoutine = null;
-    bool IsAutoSpin = false;
+
 
     [SerializeField] private GameObject charecter_happy;
     [SerializeField] private GameObject charecter_idle;
+
+    Coroutine AutoSpinRoutine = null;
+    Coroutine tweenroutine;
+    bool IsAutoSpin = false;
+    bool IsSpinning = false;
 
     private void Start()
     {
@@ -158,47 +160,68 @@ public class SlotBehaviour : MonoBehaviour
 
         if (AutoSpin_Button) AutoSpin_Button.onClick.RemoveAllListeners();
         if (AutoSpin_Button) AutoSpin_Button.onClick.AddListener(AutoSpin);
+
+        if (AutoSpinStop_Button) AutoSpinStop_Button.onClick.RemoveAllListeners();
+        if (AutoSpinStop_Button) AutoSpinStop_Button.onClick.AddListener(StopAutoSpin);
     }
 
     private void AutoSpin()
     {
-        IsAutoSpin = !IsAutoSpin;
-        if(IsAutoSpin)
+        if (!IsAutoSpin)
         {
-            //if (AutoSpin_Image) AutoSpin_Image.sprite = AutoSpinHover_Sprite;
-            if (AutoSpin_Image) AutoSpin_Image.color = new Color32(160, 160, 160, 255);
-            if(AutoSpinRoutine != null)
-            {
-                StopCoroutine(AutoSpinRoutine);
-                AutoSpinRoutine = null;
-            }
-            AutoSpinRoutine = StartCoroutine(AutoSpinCoroutine());
-        }
-        else
-        {
-            //if (AutoSpin_Image) AutoSpin_Image.sprite = AutoSpin_Sprite;
-            if (AutoSpin_Image) AutoSpin_Image.color = new Color32(255, 255, 255, 255);
-            if (SlotStart_Button) SlotStart_Button.interactable = true;
-            if (BetMinus_Button) BetMinus_Button.interactable = true;
-            if (BetPlus_Button) BetPlus_Button.interactable = true;
+
+            IsAutoSpin = true;
+            if (AutoSpinStop_Button) AutoSpinStop_Button.gameObject.SetActive(true);
+            if (AutoSpin_Button) AutoSpin_Button.gameObject.SetActive(false);
 
             if (AutoSpinRoutine != null)
             {
                 StopCoroutine(AutoSpinRoutine);
                 AutoSpinRoutine = null;
+                //StopCoroutine(tweenroutine);
+                //tweenroutine = null;
             }
+            AutoSpinRoutine = StartCoroutine(AutoSpinCoroutine());
+
         }
+    }
+
+    private void StopAutoSpin()
+    {
+        if (IsAutoSpin)
+        {
+            IsAutoSpin = false;
+            if (AutoSpinStop_Button) AutoSpinStop_Button.gameObject.SetActive(false);
+            if (AutoSpin_Button) AutoSpin_Button.gameObject.SetActive(true);
+            StartCoroutine(StopAutoSpinCoroutine());
+        }
+
     }
 
     private IEnumerator AutoSpinCoroutine()
     {
-        while(true)
+        while (IsAutoSpin)
         {
-            StartSlots(true);
-            yield return new WaitForSeconds(5);
+            StartSlots(IsAutoSpin);
+            yield return tweenroutine;
+
+
         }
     }
 
+    private IEnumerator StopAutoSpinCoroutine()
+    {
+        yield return new WaitUntil(() => !IsSpinning);
+        ToggleButtonGrp(true);
+        if (AutoSpinRoutine != null || tweenroutine != null)
+        {
+            StopCoroutine(AutoSpinRoutine);
+            StopCoroutine(tweenroutine);
+            tweenroutine = null;
+            AutoSpinRoutine = null;
+            StopCoroutine(StopAutoSpinCoroutine());
+        }
+    }
     //Fetch Lines from backend
     internal void FetchLines(string x_value, string y_value, int LineID, int count)
     {
@@ -448,9 +471,6 @@ public class SlotBehaviour : MonoBehaviour
     //starts the spin process
     private void StartSlots(bool autoSpin = false)
     {
-        //if (_audioSource) _audioSource.clip = _spinSound;
-        //if (_audioSource) _audioSource.loop = true;
-        //if (_audioSource) _audioSource.Play();
 
         if (audioController) audioController.PlayWLAudio("spin");
 
@@ -458,23 +478,24 @@ public class SlotBehaviour : MonoBehaviour
         if (charecter_idle) charecter_idle.SetActive(true);
         if(charecter_happy) charecter_happy.SetActive(false);
 
-        if(!autoSpin)
+        if (!autoSpin)
         {
-            //if (AutoSpin_Image) AutoSpin_Image.sprite = AutoSpin_Sprite;
             if (AutoSpinRoutine != null)
             {
                 StopCoroutine(AutoSpinRoutine);
+                StopCoroutine(tweenroutine);
+                tweenroutine = null;
                 AutoSpinRoutine = null;
             }
+
         }
 
-        
         if (TempList.Count > 0)
         {
             StopGameAnimation();
         }
         PayCalculator.ResetLines();
-        StartCoroutine(TweenRoutine());
+        tweenroutine = StartCoroutine(TweenRoutine());
         for (int i = 0; i < Tempimages.Count; i++)
         {
             Tempimages[i].slotImages.Clear();
@@ -485,10 +506,9 @@ public class SlotBehaviour : MonoBehaviour
     //manage the Routine for spinning of the slots
     private IEnumerator TweenRoutine()
     {
-        if (SlotStart_Button) SlotStart_Button.interactable = false;
-        if (AutoSpin_Button) AutoSpin_Button.interactable = false;
-        if (BetMinus_Button) BetMinus_Button.interactable = false;
-        if (BetPlus_Button) BetPlus_Button.interactable = false;
+        IsSpinning = true;
+        ToggleButtonGrp(false);
+
         for (int i = 0; i < numberOfSlots; i++)
         {
             InitializeTweening(Slot_Transform[i]);
@@ -508,15 +528,34 @@ public class SlotBehaviour : MonoBehaviour
         GenerateMatrix(SocketManager.tempresult.StopList);
         CheckPayoutLineBackend(SocketManager.tempresult.resultLine, SocketManager.tempresult.x_animResult, SocketManager.tempresult.y_animResult);
         KillAllTweens();
-        if (!IsAutoSpin) {
-        if (SlotStart_Button) SlotStart_Button.interactable = true;
-        if (BetMinus_Button) BetMinus_Button.interactable = true;
-        if (BetPlus_Button) BetPlus_Button.interactable = true;
+        if (!IsAutoSpin)
+        {
+            ToggleButtonGrp(true);
+            IsSpinning = false;
+
         }
-        if (AutoSpin_Button) AutoSpin_Button.interactable = true;
+        else
+        {
+
+
+            IsSpinning = false;
+            yield return new WaitForSeconds(5f);
+        }
 
     }
 
+    void ToggleButtonGrp(bool toggle)
+    {
+
+        if (SlotStart_Button) SlotStart_Button.interactable = toggle;
+        if (BetMinus_Button) BetMinus_Button.interactable = toggle;
+        if (BetPlus_Button) BetPlus_Button.interactable = toggle;
+        if (LineMinus_Button) LineMinus_Button.interactable = toggle;
+        if (LinePlus_Button) LinePlus_Button.interactable = toggle;
+        if (MaxBet_Button) MaxBet_Button.interactable = toggle;
+        if (AutoSpin_Button) AutoSpin_Button.interactable = toggle;
+
+    }
     //start the icons animation
     private void StartGameAnimation(GameObject animObjects)
     {
@@ -545,12 +584,6 @@ public class SlotBehaviour : MonoBehaviour
         {
             if (charecter_idle) charecter_idle.SetActive(false);
             if (charecter_happy) charecter_happy.SetActive(true);
-
-            //int choice = UnityEngine.Random.Range(0, 2);
-            //if (_audioSource) _audioSource.Stop();
-            //if (_audioSource) _audioSource.loop = false;
-            //if (_audioSource) _audioSource.clip = _winSounds[choice];
-            //if (_audioSource) _audioSource.Play();
             if (audioController) audioController.PlayWLAudio("win");
 
             for (int i = 0; i < LineId.Count; i++)
@@ -574,11 +607,6 @@ public class SlotBehaviour : MonoBehaviour
         else
         {
             if (audioController) audioController.PlayWLAudio("lose");
-
-            //if (_audioSource) _audioSource.Stop();
-            //if (_audioSource) _audioSource.loop = false;
-            //if (_audioSource) _audioSource.clip = _lossSound;
-            //if (_audioSource) _audioSource.Play();
 
             if (charecter_idle) charecter_idle.SetActive(true);
             if (charecter_happy) charecter_happy.SetActive(false);
