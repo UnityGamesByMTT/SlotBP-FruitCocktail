@@ -1,5 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
@@ -16,13 +16,13 @@ public class BonusGame : MonoBehaviour
 
     [Header("Sprites")]
     [SerializeField]
-    private Sprite[] myImages;  //images taken initially
+    private Sprite[] myImages;
 
     [Header("Slot Images")]
     [SerializeField]
-    private List<SlotImage> images;     //class to store total images
+    private List<SlotImage> images;
     [SerializeField]
-    private List<SlotImage> Tempimages;     //class to store the result matrix
+    private List<SlotImage> Tempimages;
 
     [Header("Slots Objects")]
     [SerializeField]
@@ -34,41 +34,6 @@ public class BonusGame : MonoBehaviour
     [Header("Slots Transforms")]
     [SerializeField]
     private Transform[] Slot_Transform;
-
-    private Dictionary<int, string> x_string = new Dictionary<int, string>();
-    private Dictionary<int, string> y_string = new Dictionary<int, string>();
-
-    [Header("Buttons")]
-    [SerializeField]
-    private Button SlotStart_Button;
-
-    [Header("Animated Sprites")]
-    //[SerializeField]
-    //private Sprite[] Bonus_Sprite;
-    [SerializeField]
-    private Sprite[] Apple_sprite;
-    [SerializeField]
-    private Sprite[] Cherry_Sprite;
-    [SerializeField]
-    private Sprite[] Coconut_Sprite;
-    [SerializeField]
-    private Sprite[] Jelly_Sprite;
-    [SerializeField]
-    private Sprite[] Juice_Sprite;
-    [SerializeField]
-    private Sprite[] Lemon_Sprite;
-    [SerializeField]
-    private Sprite[] Orange_Sprite;
-    [SerializeField]
-    private Sprite[] Pear_Sprite;
-    [SerializeField]
-    private Sprite[] Pineapple_Sprite;
-    [SerializeField]
-    private Sprite[] Strawberry_Sprite;
-    [SerializeField]
-    private Sprite[] Watermelon_Sprite;
-
-
 
 
     int tweenHeight = 0;  //calculate the height at which tweening is done
@@ -83,46 +48,82 @@ public class BonusGame : MonoBehaviour
 
 
     [SerializeField]
-    private List<ImageAnimation> TempList;  //stores the sprites whose animation is running at present 
+    private List<ImageAnimation> TempList;
 
     [SerializeField]
-    private int IconSizeFactor = 100;       //set this parameter according to the size of the icon and spacing
+    private int IconSizeFactor = 100;
 
-    private int numberOfSlots = 3;          //number of columns
+    private int numberOfSlots = 3;
 
     [SerializeField]
     int verticalVisibility = 3;
 
     [SerializeField]
     private SocketIOManager SocketManager;
+    [SerializeField] private SlotBehaviour slotBehaviour;
 
     [SerializeField] private List<int> InitalizeList = new List<int>();
 
     [SerializeField] private int stopIndex;
-    [SerializeField] private List<Sprite> OuterReelSpriteList;
+    [SerializeField] private Sprite exitSprite;
+    [SerializeField] private GameObject bonusGame;
     [SerializeField] private List<Transform> OuterReelSlots;
     [SerializeField] private GameObject OuterSlotItemPrefab;
-    [SerializeField] private List<int> leftList;
-    [SerializeField] private List<int> upList;
-    [SerializeField] private List<GameObject> OuterReeAllItem;
+    [SerializeField] private List<int> verticalList;
+    [SerializeField] private List<int> horizontalList;
+
+    [SerializeField] private List<OuterReelItem> OuterReeAllItem;
     [SerializeField] private GameObject lighting;
+
+    [SerializeField] private TMP_Text currentBet;
+    [SerializeField] private TMP_Text creditAmount;
+    [SerializeField] private TMP_Text multiplier;
+    [SerializeField] private List<int> animIndex = new List<int>();
     private bool ison = true;
+    public List<int> resultnum = new List<int>();
+    private int resultmult = 0;
+    private double bet = 0;
 
     private void Start()
     {
 
-        if (SlotStart_Button) SlotStart_Button.onClick.RemoveAllListeners();
-        if (SlotStart_Button) SlotStart_Button.onClick.AddListener(delegate { StartSlots(); });
-
-        PopulateInitalSlots(0, InitalizeList);
-        PopulateInitalSlots(1, InitalizeList);
-        PopulateInitalSlots(2, InitalizeList);
-        PopulateOuterReel();
-
+        //PopulateOuterReel();
         InvokeRepeating("ToggleOnOff", 0.1f, 0.2f);
     }
 
 
+    internal void startGame(List<int> result, double currentBet)
+    {
+
+        List<int> allItem = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        bet = currentBet;
+       
+        for (int i = 0; i < 3; i++)
+        {
+            resultnum.Add(result[i]);
+        }
+
+        stopIndex = result[3];
+
+        for (int i = 0; i < 3; i++)
+        {
+            resultmult += (result[result.Count - 1 - i]);
+        }
+
+        for (int i = 0; i < resultnum.Count; i++)
+        {
+            if (resultnum[i] == stopIndex)
+                animIndex.Add(i);
+        }
+        //Shuffle(InitalizeList);
+        PopulateOuterReel();
+        PopulateInitalSlots(0, InitalizeList);
+        PopulateInitalSlots(1, InitalizeList);
+        PopulateInitalSlots(2, InitalizeList);
+        bonusGame.SetActive(true);
+        StartSlots();
+
+    }
 
 
     //just for testing purposes delete on production
@@ -131,8 +132,7 @@ public class BonusGame : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.B))
         {
             StartSlots();
-            //MoveBorder();
-            StartCoroutine(MoveSelector());
+            MoveSelector();
 
         }
     }
@@ -143,111 +143,30 @@ public class BonusGame : MonoBehaviour
     }
 
     //reset the layout after populating the slots
-    internal void LayoutReset(int number)
-    {
-        if (Slot_Elements[number]) Slot_Elements[number].ignoreLayout = true;
-        if (SlotStart_Button) SlotStart_Button.interactable = true;
-    }
+    //internal void LayoutReset(int number)
+    //{
+    //    if (Slot_Elements[number]) Slot_Elements[number].ignoreLayout = true;
+    //    //if (SlotStart_Button) SlotStart_Button.interactable = true;
+    //}
 
     private void PopulateSlot(List<int> values, int number)
     {
+        Shuffle(values);
         if (Slot_Objects[number]) Slot_Objects[number].SetActive(true);
         for (int i = 0; i < values.Count; i++)
         {
             GameObject myImg = Instantiate(Image_Prefab, Slot_Transform[number]);
             images[number].slotImages.Add(myImg.GetComponent<Image>());
             images[number].slotImages[i].sprite = myImages[values[i]];
-            PopulateAnimationSprites(images[number].slotImages[i].gameObject.GetComponent<ImageAnimation>(), values[i]);
         }
-        for (int k = 0; k < 2; k++)
-        {
-            GameObject mylastImg = Instantiate(Image_Prefab, Slot_Transform[number]);
-            images[number].slotImages.Add(mylastImg.GetComponent<Image>());
-            images[number].slotImages[images[number].slotImages.Count - 1].sprite = myImages[values[k]];
-            PopulateAnimationSprites(images[number].slotImages[images[number].slotImages.Count - 1].gameObject.GetComponent<ImageAnimation>(), values[k]);
-        }
+        int max_child = Slot_Objects[number].transform.childCount;
+
+
+        Slot_Objects[number].transform.GetChild(max_child - resultnum[number] - 1).GetComponent<Image>().sprite = myImages[resultnum[number]];
         if (mainContainer_RT) LayoutRebuilder.ForceRebuildLayoutImmediate(mainContainer_RT);
         tweenHeight = (values.Count * IconSizeFactor) - 280;
     }
 
-    //function to populate animation sprites accordingly
-    private void PopulateAnimationSprites(ImageAnimation animScript, int val)
-    {
-        switch (val)
-        {
-
-
-            case 0:
-                for (int i = 0; i < Apple_sprite.Length; i++)
-                {
-                    animScript.textureArray.Add(Apple_sprite[i]);
-                }
-                animScript.AnimationSpeed = 30f;
-                break;
-            case 1:
-                for (int i = 0; i < Cherry_Sprite.Length; i++)
-                {
-                    animScript.textureArray.Add(Cherry_Sprite[i]);
-                }
-                animScript.AnimationSpeed = 30f;
-                break;
-            case 2:
-                for (int i = 0; i < Coconut_Sprite.Length; i++)
-                {
-                    animScript.textureArray.Add(Coconut_Sprite[i]);
-                }
-                break;
-            case 3:
-                for (int i = 0; i < Jelly_Sprite.Length; i++)
-                {
-                    animScript.textureArray.Add(Jelly_Sprite[i]);
-                }
-                break;
-            case 4:
-                for (int i = 0; i < Juice_Sprite.Length; i++)
-                {
-                    animScript.textureArray.Add(Juice_Sprite[i]);
-                }
-                break;
-            case 5:
-                for (int i = 0; i < Lemon_Sprite.Length; i++)
-                {
-                    animScript.textureArray.Add(Lemon_Sprite[i]);
-                }
-                break;
-            case 6:
-                for (int i = 0; i < Orange_Sprite.Length; i++)
-                {
-                    animScript.textureArray.Add(Orange_Sprite[i]);
-                }
-                break;
-            case 7:
-                for (int i = 0; i < Pear_Sprite.Length; i++)
-                {
-                    animScript.textureArray.Add(Pear_Sprite[i]);
-                }
-                break;
-            case 8:
-                for (int i = 0; i < Pineapple_Sprite.Length; i++)
-                {
-                    animScript.textureArray.Add(Pineapple_Sprite[i]);
-                }
-                break;
-            case 9:
-                for (int i = 0; i < Strawberry_Sprite.Length; i++)
-                {
-                    animScript.textureArray.Add(Strawberry_Sprite[i]);
-                }
-                break;
-            case 10:
-                for (int i = 0; i < Watermelon_Sprite.Length; i++)
-                {
-                    animScript.textureArray.Add(Watermelon_Sprite[i]);
-                }
-                break;
-
-        }
-    }
 
     //starts the spin process
     private void StartSlots(bool autoSpin = false)
@@ -270,39 +189,54 @@ public class BonusGame : MonoBehaviour
     //manage the Routine for spinning of the slots
     private IEnumerator TweenRoutine()
     {
-        if (SlotStart_Button) SlotStart_Button.interactable = false;
+        currentBet.text = bet.ToString();
+        yield return new WaitForSeconds(0.5f);
+        Coroutine moveSelector = StartCoroutine(ToggleSelectorAnimation(0.05f, 2));
         for (int i = 0; i < numberOfSlots; i++)
         {
             InitializeTweening(Slot_Transform[i]);
             yield return new WaitForSeconds(0.1f);
         }
 
-        SocketManager.AccumulateResult();
         yield return new WaitForSeconds(0.5f);
-        List<int> resultnum = SocketManager.tempresult.StopList?.Split(',')?.Select(Int32.Parse)?.ToList();
-
         for (int i = 0; i < numberOfSlots; i++)
         {
-            yield return StopTweening(resultnum[i], Slot_Transform[i], i);
+            yield return StopTweening(resultnum[i] + 1, Slot_Transform[i], i);
         }
 
-        yield return new WaitForSeconds(0.3f);
-        GenerateMatrix(SocketManager.tempresult.StopList);
-        CheckPayoutLineBackend(SocketManager.tempresult.resultLine, SocketManager.tempresult.x_animResult, SocketManager.tempresult.y_animResult);
+        yield return moveSelector;
+        CheckPayoutLineBackend(resultnum);
+
+        creditAmount.text = (resultmult * bet).ToString();
+        multiplier.text = "x " + resultmult.ToString();
+
+        yield return new WaitForSeconds(3f);
         KillAllTweens();
-        if (SlotStart_Button) SlotStart_Button.interactable = true;
+        Reset();
+
+
 
     }
 
-    //start the icons animation
+
+    private void CheckPayoutLineBackend(List<int> numbers)
+    {
+
+        for (int i = 0; i < animIndex.Count; i++)
+        {
+            Tempimages[animIndex[i]].slotImages.Add(images[animIndex[i]].slotImages[(images[animIndex[i]].slotImages.Count - (numbers[animIndex[i]] + 1))]);
+            StartGameAnimation(Tempimages[animIndex[i]].slotImages[0].gameObject);
+        }
+
+    }
+
     private void StartGameAnimation(GameObject animObjects)
     {
-        ImageAnimation temp = animObjects.GetComponent<ImageAnimation>();
-        temp.StartAnimation();
-        TempList.Add(temp);
+
+        Tweener tweener = animObjects.transform.DOScale(Vector3.one * 1.1f, 0.5f).SetLoops(-1, LoopType.Yoyo);
+        alltweens.Add(tweener);
     }
 
-    //stop the icons animation
     private void StopGameAnimation()
     {
         for (int i = 0; i < TempList.Count; i++)
@@ -311,106 +245,159 @@ public class BonusGame : MonoBehaviour
         }
     }
 
-    //generate the payout lines generated 
-    private void CheckPayoutLineBackend(List<int> LineId, List<string> x_AnimString, List<string> y_AnimString)
-    {
-        List<int> x_points = null;
-        List<int> y_points = null;
-        List<int> x_anim = null;
-        List<int> y_anim = null;
-
-        //for (int i = 0; i < LineId.Count; i++)
-        //{
-        //    x_points = x_string[LineId[i]]?.Split(',')?.Select(Int32.Parse)?.ToList();
-        //    y_points = y_string[LineId[i]]?.Split(',')?.Select(Int32.Parse)?.ToList();
-        //    PayCalculator.GeneratePayoutLinesBackend(x_points, y_points, x_points.Count);
-        //}
-
-        for (int i = 0; i < 3; i++)
-        {
-
-            StartGameAnimation(Tempimages[i].slotImages[0].gameObject);
-        }
-
-    }
-
-    //generate the result matrix
-    private void GenerateMatrix(string stopList)
-    {
-        List<int> numbers = stopList?.Split(',')?.Select(Int32.Parse)?.ToList();
-
-        for (int i = 0; i < numbers.Count; i++)
-        {
-            //for (int s = 0; s < verticalVisibility; s++)
-            //{
-            if (i < 3)
-                Tempimages[i].slotImages.Add(images[i].slotImages[(images[i].slotImages.Count - (numbers[i]))]);
-            //}
-        }
-    }
 
     void PopulateOuterReel()
     {
+        GameObject slotItem;
+        OuterReelItem temp;
 
         for (int i = 0; i < OuterReelSlots.Count; i++)
         {
+
             if (i % 2 == 0)
             {
-                for (int j = 0; j < leftList.Count; j++)
+                setVerticalist();
+                verticalList.RemoveAll(item => item == -1);
+                Shuffle(verticalList);
+                verticalList.Insert(0, -1);
+                verticalList.Add(-1);
+                for (int j = 0; j < verticalList.Count; j++)
                 {
-                    GameObject slotItem = Instantiate(OuterSlotItemPrefab, OuterReelSlots[i]);
-                    Image slotItemImage = slotItem.transform.GetChild(0).GetComponent<Image>();
-                    slotItemImage.sprite = OuterReelSpriteList[leftList[j]];
+                    slotItem = Instantiate(OuterSlotItemPrefab, OuterReelSlots[i]);
+                    temp = slotItem.GetComponent<OuterReelItem>();
+                    if (verticalList[j] == -1)
+                    {
+                        temp.image.sprite = exitSprite;
+                        temp.id = -1;
 
-                }
-                for (int l = 0; l < 2; l++)
-                {
-                    GameObject slotItem = Instantiate(OuterSlotItemPrefab, OuterReelSlots[i]);
-                    Image slotItemImage = slotItem.transform.GetChild(0).GetComponent<Image>();
-                    slotItemImage.sprite = OuterReelSpriteList[8];
-                    if (l == 0)
-                        slotItem.transform.SetAsFirstSibling();
+                    }
+                    else
+                    {
+                        temp.image.sprite = myImages[verticalList[j]];
+                        temp.id = verticalList[j];
+                    }
+                    if (i == 2) slotItem.transform.SetAsFirstSibling();
+                    OuterReeAllItem.Add(temp);
                 }
 
             }
             else
             {
-
-                for (int k = 0; k < upList.Count; k++)
+                setHorizontalist();
+                Shuffle(horizontalList);
+                for (int k = 0; k < horizontalList.Count; k++)
                 {
-                    GameObject slotItem = Instantiate(OuterSlotItemPrefab, OuterReelSlots[i]);
-                    slotItem.transform.GetChild(0).GetComponent<Image>().sprite = OuterReelSpriteList[upList[k]];
+                    slotItem = Instantiate(OuterSlotItemPrefab, OuterReelSlots[i]);
+                    temp = slotItem.GetComponent<OuterReelItem>();
+
+                    temp.image.sprite = myImages[horizontalList[k]];
+                    temp.id = horizontalList[k];
+                    if (i == 3) slotItem.transform.SetAsFirstSibling();
+                    OuterReeAllItem.Add(temp);
+
                 }
             }
         }
 
-        for (int i = 0; i < OuterReelSlots[0].childCount; i++)
-        {
-            OuterReeAllItem.Add(OuterReelSlots[0].GetChild(i).gameObject);
-        }
+        setOuterReel();
 
-        for (int i = 0; i < OuterReelSlots[3].childCount; i++)
-        {
-            OuterReeAllItem.Add(OuterReelSlots[3].GetChild(i).gameObject);
-        }
-
-        for (int i = OuterReelSlots[2].childCount - 1; i >= 0; i--)
-        {
-            OuterReeAllItem.Add(OuterReelSlots[2].GetChild(i).gameObject);
-        }
-
-        for (int i = OuterReelSlots[1].childCount - 1; i >= 0; i--)
-        {
-            OuterReeAllItem.Add(OuterReelSlots[1].GetChild(i).gameObject);
-        }
 
     }
 
-    void ToggleOnOff() {
-        ison=!ison;
+    void setVerticalist()
+    {
+        verticalList.Clear();
+        List<int> tempList = new List<int>();
+        for (int i = 0; i < myImages.Length; i++)
+        {
+            tempList.Add(i);
+        }
+            verticalList.Clear();
+        for (int i = 0; i < 5; i++)
+        {
+            int index = UnityEngine.Random.Range(0, tempList.Count);
+            verticalList.Add(tempList[index]);
+            tempList.Remove(tempList[index]);
+
+        }
+        tempList.Clear();
+
+    }
+
+    void setHorizontalist()
+    {
+        horizontalList.Clear();
+        List<int> tempList = new List<int>();
+        for (int i = 0; i < myImages.Length; i++)
+        {
+            tempList.Add(i);
+        }
+            horizontalList.Clear();
+        for (int i = 0; i < 6; i++)
+        {
+            int index = UnityEngine.Random.Range(0, tempList.Count);
+            horizontalList.Add(tempList[index]);
+            tempList.Remove(tempList[index]);
+
+        }
+        tempList.Clear();
+
+
+    }
+
+    void setOuterReel()
+    {
+
+        //0,6,13,19
+        List<int> outerReelIndex = new List<int>();
+        for (int i = 0; i < OuterReeAllItem.Count; i++)
+        {
+            if (OuterReeAllItem[i].id != -1)
+                outerReelIndex.Add(i);
+        }
+
+        int rndIndex = outerReelIndex[UnityEngine.Random.Range(0, outerReelIndex.Count)];
+        print("randomindex " + rndIndex);
+        OuterReeAllItem[rndIndex].image.sprite = myImages[stopIndex];
+        OuterReeAllItem[rndIndex].id = stopIndex;
+
+    }
+
+    void ToggleOnOff()
+    {
+        ison = !ison;
         lighting.SetActive(ison);
 
     }
+
+    private void Reset()
+    {
+        StopGameAnimation();
+
+        foreach (Transform item in OuterReelSlots)
+        {
+            for (int i = item.childCount - 1; i >= 0; i--)
+            {
+                Destroy(item.GetChild(i).gameObject);
+            }
+        }
+
+        resultnum.Clear();
+        animIndex.Clear();
+        OuterReeAllItem.Clear();
+        foreach (var item in images)
+        {
+            item.slotImages.Clear();
+        }
+        foreach (OuterReelItem item in OuterReeAllItem)
+        {
+            item.selector.SetActive(false);
+
+        }
+
+        bonusGame.SetActive(false);
+    }
+
 
     #region TweeningCode
     private void InitializeTweening(Transform slotTransform)
@@ -426,15 +413,15 @@ public class BonusGame : MonoBehaviour
     private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index)
     {
         alltweens[index].Pause();
-        int tweenpos = (reqpos  * IconSizeFactor);
-        alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos+115 , 0.5f).SetEase(Ease.OutElastic);
+        int tweenpos = (reqpos * (IconSizeFactor + 40)) - (IconSizeFactor + (2 * 40));
+        alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos - 100 - 40, 0.5f).SetEase(Ease.OutElastic);
         yield return new WaitForSeconds(0.2f);
     }
 
 
     private void KillAllTweens()
     {
-        for (int i = 0; i < numberOfSlots; i++)
+        for (int i = 0; i < alltweens.Count; i++)
         {
             alltweens[i].Kill();
         }
@@ -443,42 +430,43 @@ public class BonusGame : MonoBehaviour
     }
 
 
-    IEnumerator MoveSelector()
+    void MoveSelector()
     {
-
-        for (int i = 0; i < 4; i++)
-        {
-            if (i == 3)
-            {
-
-                yield return StartCoroutine(ToggleSelectorAnimation(0.1f, 9));
-                yield break;
-            }
-            yield return StartCoroutine(ToggleSelectorAnimation(0.1f));
-        }
+        StartCoroutine(ToggleSelectorAnimation(0.05f, 2));
     }
 
-    IEnumerator ToggleSelectorAnimation(float delay, int stop_index = -1)
+    IEnumerator ToggleSelectorAnimation(float delay, int noOfRotation = 1)
     {
-
-        for (int i = 0; i < OuterReeAllItem.Count; i++)
+        for (int j = 0; j < noOfRotation + 1; j++)
         {
-
-            if (i == stop_index)
+            foreach (OuterReelItem item in OuterReeAllItem)
             {
+                item.selector.SetActive(true);
+                if (j == noOfRotation && item.id == stopIndex)
+                {
 
-                OuterReeAllItem[i].transform.GetChild(1).gameObject.SetActive(true);
-                yield break;
+                    slotBehaviour.CheckPopups = false;
+                    yield break;
+                }
+                yield return new WaitForSeconds(delay);
+                item.selector.SetActive(false);
+
             }
-            OuterReeAllItem[i].transform.GetChild(1).gameObject.SetActive(true);
-
-
-            yield return new WaitForSeconds(delay);
-
-            OuterReeAllItem[i].transform.GetChild(1).gameObject.SetActive(false);
-
         }
 
+    }
+
+    void Shuffle(List<int> ts)
+    {
+        int count = ts.Count;
+        int last = count - 1;
+        for (int i = 0; i < last; ++i)
+        {
+            int r = UnityEngine.Random.Range(i, count);
+            int tmp = ts[i];
+            ts[i] = ts[r];
+            ts[r] = tmp;
+        }
     }
     #endregion
 }

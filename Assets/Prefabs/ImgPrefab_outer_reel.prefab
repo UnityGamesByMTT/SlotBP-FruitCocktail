@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 1351920071080587217}
   - component: {fileID: 5287935817171404079}
   - component: {fileID: 7833985049316284805}
-  - component: {fileID: 6693878718180354349}
+  - component: {fileID: 2061126081781457615}
   m_Layer: 5
-  m_Name: ImagePrefab outer reel
+  m_Name: ImgPrefab_outer_reel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -78,7 +78,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6693878718180354349
+--- !u!114 &2061126081781457615
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -87,20 +87,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 595047196131445314}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d9ae1bf2ec654621a0c3eaff2a909fd, type: 3}
+  m_Script: {fileID: 11500000, guid: e2f57891b26b6480d8e1058b9450efe7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textureArray: []
-  rendererDelegate: {fileID: 7833985049316284805}
-  useSharedMaterial: 1
-  doLoopAnimation: 1
-  currentAnimationState: 0
-  AnimationSpeed: 12
-  delayBetweenLoop: 0
-  StartOnAwake: 0
-  DestroyOnCompletion: 0
-  isplaying: 0
-  OriginalSprite: {fileID: 0}
+  id: 0
+  isExit: 0
+  selector: {fileID: 6606853070141270208}
+  image: {fileID: 1906166881787696317}
 --- !u!1 &2523096090607715030
 GameObject:
   m_ObjectHideFlags: 0

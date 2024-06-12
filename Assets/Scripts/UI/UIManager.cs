@@ -47,6 +47,9 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private RectTransform Paytable_RT;
 
+
+    [SerializeField] private Button GameExit_Button;
+
     [Header("Popus UI")]
     [SerializeField]
     private GameObject MainPopup_Object;
@@ -88,14 +91,24 @@ public class UIManager : MonoBehaviour
     private GameObject SoundOn_Object;
     [SerializeField]
     private GameObject SoundOff_Object;
+    [SerializeField] private TMP_Text[] SymbolsText;
+
+    [SerializeField] private TMP_Text megaWInText;
+    [SerializeField] private GameObject megaWIn;
 
     private bool isMusic = true;
     private bool isSound = true;
 
     [SerializeField] private AudioController audioController;
+    [SerializeField] private SlotBehaviour slotManager;
+    private int FreeSpins;
+    public int currentSpin;
+    [SerializeField] private TMP_Text freeSpintext;
+    [SerializeField] private Image freeSpinSlider;
 
     private void Start()
     {
+
         if (Menu_Button) Menu_Button.onClick.RemoveAllListeners();
         if (Menu_Button) Menu_Button.onClick.AddListener(OpenMenu);
 
@@ -126,14 +139,13 @@ public class UIManager : MonoBehaviour
         if (SoundOn_Object) SoundOn_Object.SetActive(true);
         if (SoundOff_Object) SoundOff_Object.SetActive(false);
 
-        //if (BG_Sounds) BG_Sounds.mute = false;
-        //if (Spin_Sounds) Spin_Sounds.mute = false;
-        //if (Button_Sounds) Button_Sounds.mute = false;
-        if (Left_Arrow) Left_Arrow.onClick.RemoveAllListeners();
-        if (Left_Arrow) Left_Arrow.onClick.AddListener(delegate { slide(-1); });
+        if (GameExit_Button) GameExit_Button.onClick.RemoveAllListeners();
+        if (GameExit_Button) GameExit_Button.onClick.AddListener(CallOnExitFunction);
 
-        if (Right_Arrow) Right_Arrow.onClick.RemoveAllListeners();
-        if (Right_Arrow) Right_Arrow.onClick.AddListener(delegate { slide(1); });
+        //if (FreeSpin_Button) FreeSpin_Button.onClick.RemoveAllListeners();
+        //if (FreeSpin_Button) FreeSpin_Button.onClick.AddListener(delegate { StartFreeSpins(FreeSpins); });
+
+        if (audioController) audioController.ToggleMute(false);
 
         isMusic = true;
         isSound = true;
@@ -146,10 +158,117 @@ public class UIManager : MonoBehaviour
 
     }
 
+    internal void PopulateWin(int value, double amount)
+    {
+        //if (Win_Image) Win_Image.sprite = MegaWin_Sprite;
+        OpenPopup(megaWIn);
+        StartPopupAnim(amount);
+    }
+
+    internal void StartFreeSpins(int spins)
+    {
+
+        FreeSpins = spins;
+        currentSpin = FreeSpins;
+        print("spin"+currentSpin);
+        freeSpinSlider.fillAmount = 1f;
+        freeSpintext.text = FreeSpins.ToString();
+        Invoke("FreeSpinProcess",1.5f);
+
+
+    }
+
+    private void FreeSpinProcess()
+    {
+
+        slotManager.FreeSpin(FreeSpins);
+    }
+
+    internal void updateFreespinInfo() {
+        currentSpin--;
+        if (currentSpin > 0)
+            freeSpinSlider.fillAmount = (float)currentSpin / (float)FreeSpins;
+        else
+            freeSpinSlider.fillAmount = 0;
+        freeSpintext.text = currentSpin.ToString();
+    }
+    private void StartPopupAnim(double amount)
+    {
+        int initAmount = 0;
+        //if (WinPopup_Object) WinPopup_Object.SetActive(true);
+        if (MainPopup_Object) MainPopup_Object.SetActive(true);
+
+        DOTween.To(() => initAmount, (val) => initAmount = val, (int)amount, 2f).OnUpdate(() =>
+        {
+            if (megaWInText) megaWInText.text = initAmount.ToString();
+        });
+
+        DOVirtual.DelayedCall(6f, () =>
+        {
+            if (megaWIn) megaWIn.SetActive(false);
+            if (MainPopup_Object) MainPopup_Object.SetActive(false);
+            slotManager.CheckBonusGame();
+        });
+    }
+
+    internal void InitialiseUIData(string SupportUrl, string AbtImgUrl, string TermsUrl, string PrivacyUrl, Paylines symbolsText, List<string> Specialsymbols)
+    {
+        //if (Support_Button) Support_Button.onClick.RemoveAllListeners();
+        //if (Support_Button) Support_Button.onClick.AddListener(delegate { UrlButtons(SupportUrl); });
+
+        //if (Terms_Button) Terms_Button.onClick.RemoveAllListeners();
+        //if (Terms_Button) Terms_Button.onClick.AddListener(delegate { UrlButtons(TermsUrl); });
+
+        //if (Privacy_Button) Privacy_Button.onClick.RemoveAllListeners();
+        //if (Privacy_Button) Privacy_Button.onClick.AddListener(delegate { UrlButtons(PrivacyUrl); });
+
+        PopulateSymbolsPayout(symbolsText);
+        //PopulateSpecialSymbols(Specialsymbols);
+    }
+
+    private void PopulateSpecialSymbols(List<string> Specialtext)
+    {
+        //for (int i = 0; i < SpecialSymbolsText.Length; i++)
+        //{
+        //    if (SpecialSymbolsText[i]) SpecialSymbolsText[i].text = Specialtext[i];
+        //}
+    }
+
+    private void PopulateSymbolsPayout(Paylines paylines)
+    {
+        print("length" + paylines.symbols.Count);
+        for (int i = 0; i < paylines.symbols.Count; i++)
+        {
+            string text = null;
+            if (paylines.symbols[i].multiplier._5x != 0)
+            {
+                text += "<color=#20BADB>5x</color> - " + "<color=#F8D229>" + paylines.symbols[i].multiplier._5x+ "</color>";
+            }
+            if (paylines.symbols[i].multiplier._4x != 0)
+            {
+                text += "\n<color=#20BADB>4x</color> - " + "<color=#F8D229>" + paylines.symbols[i].multiplier._4x + "</color>";
+            }
+            if (paylines.symbols[i].multiplier._3x != 0)
+            {
+                text += "\n<color=#20BADB>3x</color> - " + "<color=#F8D229>" + paylines.symbols[i].multiplier._3x+"</color>";
+            }
+            if (paylines.symbols[i].multiplier._2x != 0)
+            {
+                text += "\n<color=#20BADB>2x</color> - " + "<color=#F8D229>"+paylines.symbols[i].multiplier._2x+"</color>";
+            }
+            if (SymbolsText[i]) SymbolsText[i].text = text;
+        }
+    }
+
+    private void CallOnExitFunction()
+    {
+        slotManager.CallCloseSocket();
+        Application.ExternalCall("window.parent.postMessage", "onExit", "*");
+    }
+
     private void OpenMenu()
     {
-        if (audioController) audioController.PlayButtonAudio();
-
+        audioController.PlayButtonAudio();
         if (Menu_Object) Menu_Object.SetActive(false);
         if (Exit_Object) Exit_Object.SetActive(true);
         if (About_Object) About_Object.SetActive(true);
@@ -174,7 +293,6 @@ public class UIManager : MonoBehaviour
 
     private void CloseMenu()
     {
-        if (audioController) audioController.PlayButtonAudio();
 
         DOTween.To(() => About_RT.anchoredPosition, (val) => About_RT.anchoredPosition = val, new Vector2(About_RT.anchoredPosition.x, About_RT.anchoredPosition.y - 150), 0.1f).OnUpdate(() =>
         {
@@ -192,19 +310,18 @@ public class UIManager : MonoBehaviour
         });
 
         DOVirtual.DelayedCall(0.1f, () =>
-         {
-             if (Menu_Object) Menu_Object.SetActive(true);
-             if (Exit_Object) Exit_Object.SetActive(false);
-             if (About_Object) About_Object.SetActive(false);
-             if (Paytable_Object) Paytable_Object.SetActive(false);
-             if (Settings_Object) Settings_Object.SetActive(false);
-         });
+        {
+            if (Menu_Object) Menu_Object.SetActive(true);
+            if (Exit_Object) Exit_Object.SetActive(false);
+            if (About_Object) About_Object.SetActive(false);
+            if (Paytable_Object) Paytable_Object.SetActive(false);
+            if (Settings_Object) Settings_Object.SetActive(false);
+        });
     }
 
     private void OpenPopup(GameObject Popup)
     {
         if (audioController) audioController.PlayButtonAudio();
-
         if (Popup) Popup.SetActive(true);
         if (MainPopup_Object) MainPopup_Object.SetActive(true);
     }
@@ -212,7 +329,6 @@ public class UIManager : MonoBehaviour
     private void ClosePopup(GameObject Popup)
     {
         if (audioController) audioController.PlayButtonAudio();
-
         if (Popup) Popup.SetActive(false);
         if (MainPopup_Object) MainPopup_Object.SetActive(false);
     }
@@ -220,65 +336,43 @@ public class UIManager : MonoBehaviour
     private void ToggleMusic()
     {
         isMusic = !isMusic;
-        if(isMusic)
+        if (isMusic)
         {
             if (MusicOn_Object) MusicOn_Object.SetActive(true);
             if (MusicOff_Object) MusicOff_Object.SetActive(false);
-            if (audioController) audioController.ToggleMute(false,"bg");
-
-            //if (BG_Sounds) BG_Sounds.mute = false;
+            audioController.ToggleMute(false, "bg");
         }
         else
         {
             if (MusicOn_Object) MusicOn_Object.SetActive(false);
             if (MusicOff_Object) MusicOff_Object.SetActive(true);
-            if (audioController) audioController.ToggleMute(true, "bg");
-            //if (BG_Sounds) BG_Sounds.mute = true;
+            audioController.ToggleMute(true, "bg");
         }
     }
 
-    private void slide(int i)
+    private void UrlButtons(string url)
     {
-        if (audioController) audioController.PlayButtonAudio();
-
-        if (CurrentIndex < paytableList.Length - 1 && i > 0)
-        {
-            paytableList[CurrentIndex].SetActive(false);
-            paytableList[CurrentIndex + 1].SetActive(true);
-            CurrentIndex++;
-        }
-
-        if (CurrentIndex >= 1 && i < 0)
-        {
-            paytableList[CurrentIndex].SetActive(false);
-            paytableList[CurrentIndex - 1].SetActive(true);
-            CurrentIndex--;
-        }
-
-
+        Application.OpenURL(url);
     }
 
     private void ToggleSound()
     {
         isSound = !isSound;
-        if(isSound)
+        if (isSound)
         {
             if (SoundOn_Object) SoundOn_Object.SetActive(true);
             if (SoundOff_Object) SoundOff_Object.SetActive(false);
-            if (audioController) audioController.ToggleMute(false, "wl");
             if (audioController) audioController.ToggleMute(false, "button");
-            //if (Spin_Sounds) Spin_Sounds.mute = false;
-            //if (Button_Sounds) Button_Sounds.mute = false;
+            if (audioController) audioController.ToggleMute(false, "wl");
         }
         else
         {
             if (SoundOn_Object) SoundOn_Object.SetActive(false);
             if (SoundOff_Object) SoundOff_Object.SetActive(true);
-
-            if (audioController) audioController.ToggleMute(true, "wl");
             if (audioController) audioController.ToggleMute(true, "button");
-            //if (Spin_Sounds) Spin_Sounds.mute = true;
-            //if (Button_Sounds) Button_Sounds.mute = true;
+            if (audioController) audioController.ToggleMute(true, "wl");
         }
     }
+
+
 }
