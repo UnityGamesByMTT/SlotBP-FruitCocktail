@@ -539,14 +539,14 @@ public class SlotBehaviour : MonoBehaviour
 
         try
         {
-            balance = double.Parse(Balance_text.text);
+            if (Balance_text) balance = double.Parse(Balance_text.text);
         }
         catch (Exception e)
         {
             Debug.Log("Error while conversion " + e.Message);
         }
 
-        balance = balance - bet;
+        //balance = balance - bet;
 
         if (Balance_text) Balance_text.text = balance.ToString();
 
