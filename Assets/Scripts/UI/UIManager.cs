@@ -192,6 +192,7 @@ public class UIManager : MonoBehaviour
             freeSpinSlider.fillAmount = 0;
         freeSpintext.text = currentSpin.ToString();
     }
+
     private void StartPopupAnim(double amount)
     {
         int initAmount = 0;

@@ -89,6 +89,7 @@ public class BonusGame : MonoBehaviour
 
         //PopulateOuterReel();
         InvokeRepeating("ToggleOnOff", 0.1f, 0.2f);
+        //startGame(new List<int> { 1, 3, 3, 5, 6, 7 }, 0.1);
     }
 
 
@@ -155,7 +156,8 @@ public class BonusGame : MonoBehaviour
         if (Slot_Objects[number]) Slot_Objects[number].SetActive(true);
         for (int i = 0; i < values.Count; i++)
         {
-            GameObject myImg = Instantiate(Image_Prefab, Slot_Transform[number]);
+            //GameObject myImg = Instantiate(Image_Prefab, Slot_Transform[number]);
+            GameObject myImg = null;
             images[number].slotImages.Add(myImg.GetComponent<Image>());
             images[number].slotImages[i].sprite = myImages[values[i]];
         }
@@ -171,8 +173,6 @@ public class BonusGame : MonoBehaviour
     //starts the spin process
     private void StartSlots(bool autoSpin = false)
     {
-
-
         if (TempList.Count > 0)
         {
             StopGameAnimation();
@@ -263,7 +263,8 @@ public class BonusGame : MonoBehaviour
                 verticalList.Add(-1);
                 for (int j = 0; j < verticalList.Count; j++)
                 {
-                    slotItem = Instantiate(OuterSlotItemPrefab, OuterReelSlots[i]);
+                    //slotItem = Instantiate(OuterSlotItemPrefab, OuterReelSlots[i]);
+                    slotItem = null;
                     temp = slotItem.GetComponent<OuterReelItem>();
                     if (verticalList[j] == -1)
                     {
@@ -287,7 +288,8 @@ public class BonusGame : MonoBehaviour
                 Shuffle(horizontalList);
                 for (int k = 0; k < horizontalList.Count; k++)
                 {
-                    slotItem = Instantiate(OuterSlotItemPrefab, OuterReelSlots[i]);
+                    //slotItem = Instantiate(OuterSlotItemPrefab, OuterReelSlots[i]);
+                    slotItem = null;
                     temp = slotItem.GetComponent<OuterReelItem>();
 
                     temp.image.sprite = myImages[horizontalList[k]];
