@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using System.Linq;
 using TMPro;
 using System;
+using Newtonsoft.Json.Linq;
 
 
 public class UIManager : MonoBehaviour
@@ -47,6 +48,12 @@ public class UIManager : MonoBehaviour
     [SerializeField]
     private RectTransform Paytable_RT;
 
+    [SerializeField]
+    private GameObject m_MenuButtonHolder;
+    [SerializeField]
+    private Button m_OpenMenu;
+    [SerializeField]
+    private Button m_CloseMenu;
 
     [SerializeField] private Button GameExit_Button;
 
@@ -142,6 +149,12 @@ public class UIManager : MonoBehaviour
         if (GameExit_Button) GameExit_Button.onClick.RemoveAllListeners();
         if (GameExit_Button) GameExit_Button.onClick.AddListener(CallOnExitFunction);
 
+        if (m_OpenMenu) m_OpenMenu.onClick.RemoveAllListeners();
+        if (m_OpenMenu) m_OpenMenu.onClick.AddListener(delegate { OpenCloseMenu(true); });
+
+        if (m_CloseMenu) m_CloseMenu.onClick.RemoveAllListeners();
+        if (m_CloseMenu) m_CloseMenu.onClick.AddListener(delegate { OpenCloseMenu(false); });
+
         //if (FreeSpin_Button) FreeSpin_Button.onClick.RemoveAllListeners();
         //if (FreeSpin_Button) FreeSpin_Button.onClick.AddListener(delegate { StartFreeSpins(FreeSpins); });
 
@@ -224,7 +237,7 @@ public class UIManager : MonoBehaviour
         //if (Privacy_Button) Privacy_Button.onClick.AddListener(delegate { UrlButtons(PrivacyUrl); });
 
         PopulateSymbolsPayout(symbolsText);
-        //PopulateSpecialSymbols(Specialsymbols);
+        PopulateSpecialSymbols(Specialsymbols);
     }
 
     private void PopulateSpecialSymbols(List<string> Specialtext)
@@ -237,27 +250,28 @@ public class UIManager : MonoBehaviour
 
     private void PopulateSymbolsPayout(Paylines paylines)
     {
-        print("length" + paylines.symbols.Count);
+        Debug.Log(string.Concat("<color=brown><b>", "Length: " + paylines.symbols.Count, "</b></color>"));
         for (int i = 0; i < paylines.symbols.Count; i++)
         {
             string text = null;
-            if (paylines.symbols[i].multiplier._5x != 0)
-            {
-                text += "<color=#20BADB>5x</color> - " + "<color=#F8D229>" + paylines.symbols[i].multiplier._5x+ "</color>";
-            }
-            if (paylines.symbols[i].multiplier._4x != 0)
-            {
-                text += "\n<color=#20BADB>4x</color> - " + "<color=#F8D229>" + paylines.symbols[i].multiplier._4x + "</color>";
-            }
-            if (paylines.symbols[i].multiplier._3x != 0)
-            {
-                text += "\n<color=#20BADB>3x</color> - " + "<color=#F8D229>" + paylines.symbols[i].multiplier._3x+"</color>";
-            }
-            if (paylines.symbols[i].multiplier._2x != 0)
-            {
-                text += "\n<color=#20BADB>2x</color> - " + "<color=#F8D229>"+paylines.symbols[i].multiplier._2x+"</color>";
-            }
-            if (SymbolsText[i]) SymbolsText[i].text = text;
+
+            //if (paylines.symbols[i].multiplier._5x != 0)
+            //{
+            //    text += "<color=#20BADB>5x</color> - " + "<color=#F8D229>" + paylines.symbols[i].multiplier._5x + "</color>";
+            //}
+            //if (paylines.symbols[i].multiplier._4x != 0)
+            //{
+            //    text += "\n<color=#20BADB>4x</color> - " + "<color=#F8D229>" + paylines.symbols[i].multiplier._4x + "</color>";
+            //}
+            //if (paylines.symbols[i].multiplier._3x != 0)
+            //{
+            //    text += "\n<color=#20BADB>3x</color> - " + "<color=#F8D229>" + paylines.symbols[i].multiplier._3x + "</color>";
+            //}
+            //if (paylines.symbols[i].multiplier._2x != 0)
+            //{
+            //    text += "\n<color=#20BADB>2x</color> - " + "<color=#F8D229>" + paylines.symbols[i].multiplier._2x + "</color>";
+            //}
+            //if (SymbolsText[i]) SymbolsText[i].text = text;
         }
     }
 
@@ -375,5 +389,23 @@ public class UIManager : MonoBehaviour
         }
     }
 
-
+    private void OpenCloseMenu(bool m_toggle)
+    {
+        if (m_toggle)
+        {
+            for(int i = 0; i < m_MenuButtonHolder.transform.childCount; i++)
+            {
+                m_MenuButtonHolder.transform.GetChild(i).DOLocalMoveY(195 -  (i * 120), 0.3f);
+            }
+            m_OpenMenu.gameObject.SetActive(false);
+        }
+        else
+        {
+            for (int i = 0; i < m_MenuButtonHolder.transform.childCount; i++)
+            {
+                m_MenuButtonHolder.transform.GetChild(i).DOLocalMoveY(195, 0.3f);
+            }
+            m_OpenMenu.gameObject.SetActive(true);
+        }
+    }
 }
