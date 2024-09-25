@@ -39,7 +39,8 @@ public class SlotBehaviour : MonoBehaviour
     [Header("Buttons")]
     [SerializeField]
     private Button SlotStart_Button;
-    [SerializeField] private Button AutoSpinStop_Button;
+    [SerializeField]
+    private Button AutoSpinStop_Button;
     [SerializeField]
     private Button AutoSpin_Button;
     [SerializeField]
@@ -329,6 +330,7 @@ public class SlotBehaviour : MonoBehaviour
             if (BetCounter < SocketManager.initialData.Bets.Count - 1)
             {
                 BetCounter++;
+                LineCounter++;
             }
         }
         else
@@ -336,10 +338,12 @@ public class SlotBehaviour : MonoBehaviour
             if (BetCounter > 0)
             {
                 BetCounter--;
+                LineCounter--;
             }
         }
 
         if (TotalBet_text) TotalBet_text.text = SocketManager.initialData.Bets[BetCounter].ToString();
+        if (Lines_text) Lines_text.text = SocketManager.initialData.LinesCount[LineCounter].ToString();
     }
 
 
@@ -361,11 +365,11 @@ public class SlotBehaviour : MonoBehaviour
     internal void SetInitialUI()
     {
         BetCounter = 0;
-        LineCounter = SocketManager.initialData.LinesCount.Count - 1;
+        LineCounter = 0;
         if (TotalBet_text) TotalBet_text.text = SocketManager.initialData.Bets[BetCounter].ToString();
         if (Lines_text) Lines_text.text = SocketManager.initialData.LinesCount[LineCounter].ToString();
         if (TotalWin_text) TotalWin_text.text = SocketManager.playerdata.haveWon.ToString();
-        if (Balance_text) Balance_text.text = ((double)SocketManager.playerdata.Balance).ToString();
+        if (Balance_text) Balance_text.text = (SocketManager.playerdata.Balance).ToString();
         //_bonusManager.PopulateWheel(SocketManager.bonusdata);
         uiManager.InitialiseUIData(SocketManager.initUIData.AbtLogo.link, SocketManager.initUIData.AbtLogo.logoSprite, SocketManager.initUIData.ToULink, SocketManager.initUIData.PopLink, SocketManager.initUIData.paylines, SocketManager.initUIData.spclSymbolTxt);
     }
@@ -551,7 +555,7 @@ public class SlotBehaviour : MonoBehaviour
 
         if (Balance_text) Balance_text.text = balance.ToString();
 
-        SocketManager.AccumulateResult(bet);
+        SocketManager.AccumulateResult(BetCounter);
         yield return new WaitUntil(() => SocketManager.isResultdone);
 
         Debug.Log(string.Concat("<color=green><b>", string.Join(", ", SocketManager.resultData.ResultReel[0]), "</b></color>"));
@@ -584,7 +588,7 @@ public class SlotBehaviour : MonoBehaviour
 
         CheckPopups = true;
 
-        if ((double)SocketManager.resultData.WinAmout >= bet * 15)
+        if (SocketManager.resultData.WinAmout >= bet * 15)
         {
             uiManager.PopulateWin(3, (double)SocketManager.resultData.WinAmout);
         }

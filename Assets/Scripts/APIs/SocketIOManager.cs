@@ -10,6 +10,8 @@ using System.Linq;
 using Newtonsoft.Json;
 using Best.SocketIO;
 using Best.SocketIO.Events;
+using System.Runtime.Serialization;
+using Newtonsoft.Json.Linq;
 
 public class SocketIOManager : MonoBehaviour
 {
@@ -28,24 +30,18 @@ public class SocketIOManager : MonoBehaviour
 
     //HACK: Socket URI
     //protected string TestSocketURI = "https://game-crm-rtp-backend.onrender.com/";
-    protected string TestSocketURI = "https://6f01c04j-5000.inc1.devtunnels.ms/";
+    protected string TestSocketURI = "https://6f01c04j-5000.inc1.devtunnels.ms/"; // Gaurav Port
+    //protected string TestSocketURI = "https://7p68wzhv-5000.inc1.devtunnels.ms/"; // Rahul Port
     protected string SocketURI = null;
 
     [SerializeField]
     private string TestToken;
-    protected string gameID = "SL-FC";
+    protected string gameID = "";
 
     internal bool isLoaded = false;
     internal bool SetInit = false;
     private const int maxReconnectionAttempts = 6;
     private readonly TimeSpan reconnectionDelay = TimeSpan.FromSeconds(10);
-
-    //HACK: Dummy Response For Slot Population
-    internal int[,] LinesString =
-        { { 1, 2, 3, 4, 5 },
-          { 6, 7, 8, 9, 3 },
-          { 3, 4, 5, 6, 2 }
-        };
 
     private void Start()
     {
@@ -207,6 +203,16 @@ public class SocketIOManager : MonoBehaviour
         //uiManager.ADfunction();
     }
 
+    private void SendPing()
+    {
+        InvokeRepeating("AliveRequest", 0f, 3f);
+    }
+
+    private void AliveRequest()
+    {
+        SendDataWithNamespace("YES I AM ALIVE");
+    }
+
     private void InitRequest(string eventName)
     {
         InitData message = new InitData();
@@ -316,28 +322,32 @@ public class SocketIOManager : MonoBehaviour
     internal void AccumulateResult(double currBet)
     {
         isResultdone = false;
-        SendDataWithNamespace("SPIN", currBet, "message");
-    }
-
-    private void SendDataWithNamespace(string namespaceName, double bet, string eventName)
-    {
-        // Construct message data
-
         MessageData message = new MessageData();
         message.data = new BetData();
-        message.data.currentBet = bet;
-        message.data.currentLines = 9;
+        message.data.currentBet = currBet;
         message.data.spins = 1;
-        message.id = namespaceName;
+        message.data.currentLines = 20;
+        message.id = "SPIN";
         // Serialize message data to JSON
         string json = JsonUtility.ToJson(message);
-        Debug.Log(json);
+        SendDataWithNamespace("message", json);
+    }
+
+    private void SendDataWithNamespace(string eventName, string json = null)
+    {
         // Send the message
         if (this.manager.Socket != null && this.manager.Socket.IsOpen)
         {
-            this.manager.Socket.Emit(eventName, json);
-            Debug.Log("JSON data sent: " + json);
-        }
+            if (json != null)
+            {
+                this.manager.Socket.Emit(eventName, json);
+                Debug.Log("JSON data sent: " + json);
+            }
+            else
+            {
+                this.manager.Socket.Emit(eventName);
+            }
+        }   
         else
         {
             Debug.LogWarning("Socket is not connected.");
@@ -432,12 +442,45 @@ public class GameData
     public List<List<string>> ResultReel { get; set; }
     public List<int> linesToEmit { get; set; }
     public List<List<string>> symbolsToEmit { get; set; }
-    public object WinAmout { get; set; }
+    public double WinAmout { get; set; }
     public FreeSpins freeSpins { get; set; }
     public int jackpot { get; set; }
     public bool isBonus { get; set; }
     public int BonusStopIndex { get; set; }
-    public List<object> BonusResult { get; set; }
+
+    //public object BonusResult { get; set; }
+
+    //HACK:
+    [JsonProperty("BonusResult")]
+    public object BonusResultObject { get; set; }
+
+    // This property will hold the properly deserialized list of lists of integers
+    [JsonIgnore]
+    public BonusResult BonusResult { get; private set; }
+
+    // Custom deserialization method to handle the conversion
+    [OnDeserialized]
+    internal void OnDeserializedMethod(StreamingContext context)
+    {
+        // Handle the case where multiplier is an object (empty in JSON)
+        if (BonusResultObject is JObject)
+        {
+            // Deserialize normally assuming it's an array of arrays
+            BonusResult = JsonConvert.DeserializeObject<BonusResult>(BonusResultObject.ToString());
+        }
+        else
+        {
+            BonusResult = null;
+        }
+    }
+}
+
+public class BonusResult
+{
+    public List<List<int>> innerMatrix { get; set; }
+    public List<int> outerRingSymbol { get; set; }
+    public double totalWinAmount { get; set; }
+    public List<string> winings { get; set; }
 }
 
 public class Message
@@ -464,7 +507,7 @@ public class Payout
 
 public class PlayerData
 {
-    public object Balance { get; set; }
+    public double Balance { get; set; }
     public object haveWon { get; set; }
     public double currentWining { get; set; }
     public object totalbet { get; set; }
@@ -481,7 +524,28 @@ public class Symbol
 {
     public int ID { get; set; }
     public string Name { get; set; }
-    public object multiplier { get; set; }
+    [JsonProperty("multiplier")]
+    public object MultiplierObject { get; set; }
+
+    // This property will hold the properly deserialized list of lists of integers
+    [JsonIgnore]
+    public List<List<int>> Multiplier { get; private set; }
+
+    // Custom deserialization method to handle the conversion
+    [OnDeserialized]
+    internal void OnDeserializedMethod(StreamingContext context)
+    {
+        // Handle the case where multiplier is an object (empty in JSON)
+        if (MultiplierObject is JObject)
+        {
+            Multiplier = new List<List<int>>();
+        }
+        else
+        {
+            // Deserialize normally assuming it's an array of arrays
+            Multiplier = JsonConvert.DeserializeObject<List<List<int>>>(MultiplierObject.ToString());
+        }
+    }
     public object defaultAmount { get; set; }
     public object symbolsCount { get; set; }
     public object increaseValue { get; set; }

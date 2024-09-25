@@ -89,7 +89,8 @@ public class BonusGame : MonoBehaviour
 
         //PopulateOuterReel();
         InvokeRepeating("ToggleOnOff", 0.1f, 0.2f);
-        //startGame(new List<int> { 1, 3, 3, 5, 6, 7 }, 0.1);
+        //startGame(new List<int> { 2, 3, 4, 5, 6, 3, 4, 3, 2, 2, 3, 4, 5, 7 }, 0.1);
+        tweenHeight = (myImages.Length * IconSizeFactor) - 280;
     }
 
 
@@ -116,7 +117,7 @@ public class BonusGame : MonoBehaviour
             if (resultnum[i] == stopIndex)
                 animIndex.Add(i);
         }
-        //Shuffle(InitalizeList);
+        Shuffle(InitalizeList);
         PopulateOuterReel();
         PopulateInitalSlots(0, InitalizeList);
         PopulateInitalSlots(1, InitalizeList);
@@ -166,7 +167,6 @@ public class BonusGame : MonoBehaviour
 
         Slot_Objects[number].transform.GetChild(max_child - resultnum[number] - 1).GetComponent<Image>().sprite = myImages[resultnum[number]];
         if (mainContainer_RT) LayoutRebuilder.ForceRebuildLayoutImmediate(mainContainer_RT);
-        tweenHeight = (values.Count * IconSizeFactor) - 280;
     }
 
 
@@ -263,14 +263,13 @@ public class BonusGame : MonoBehaviour
                 verticalList.Add(-1);
                 for (int j = 0; j < verticalList.Count; j++)
                 {
-                    //slotItem = Instantiate(OuterSlotItemPrefab, OuterReelSlots[i]);
+                    slotItem = OuterReeAllItem[i].gameObject;
                     slotItem = null;
                     temp = slotItem.GetComponent<OuterReelItem>();
                     if (verticalList[j] == -1)
                     {
                         temp.image.sprite = exitSprite;
                         temp.id = -1;
-
                     }
                     else
                     {
@@ -278,7 +277,6 @@ public class BonusGame : MonoBehaviour
                         temp.id = verticalList[j];
                     }
                     if (i == 2) slotItem.transform.SetAsFirstSibling();
-                    OuterReeAllItem.Add(temp);
                 }
 
             }
@@ -288,22 +286,18 @@ public class BonusGame : MonoBehaviour
                 Shuffle(horizontalList);
                 for (int k = 0; k < horizontalList.Count; k++)
                 {
-                    //slotItem = Instantiate(OuterSlotItemPrefab, OuterReelSlots[i]);
+                    slotItem = OuterReeAllItem[i].gameObject;
                     slotItem = null;
                     temp = slotItem.GetComponent<OuterReelItem>();
 
                     temp.image.sprite = myImages[horizontalList[k]];
                     temp.id = horizontalList[k];
                     if (i == 3) slotItem.transform.SetAsFirstSibling();
-                    OuterReeAllItem.Add(temp);
-
                 }
             }
         }
 
         setOuterReel();
-
-
     }
 
     void setVerticalist()
