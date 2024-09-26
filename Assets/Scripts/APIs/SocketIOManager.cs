@@ -280,8 +280,8 @@ public class SocketIOManager : MonoBehaviour
             case "ResultData":
                 {
                     Debug.Log(jsonObject);
-                    //myData.message.GameData.FinalResultReel = ConvertListOfListsToStrings(myData.message.GameData.ResultReel);
-                    //myData.message.GameData.FinalsymbolsToEmit = TransformAndRemoveRecurring(myData.message.GameData.symbolsToEmit);
+                    myData.message.GameData.FinalResultReel = ConvertListOfListsToStrings(myData.message.GameData.ResultReel);
+                    myData.message.GameData.FinalsymbolsToEmit = TransformAndRemoveRecurring(myData.message.GameData.symbolsToEmit);
                     resultData = myData.message.GameData;
                     playerdata = myData.message.PlayerData;
                     isResultdone = true;
@@ -473,6 +473,9 @@ public class GameData
             BonusResult = null;
         }
     }
+
+    public List<string> FinalsymbolsToEmit { get; set; }
+    public List<string> FinalResultReel { get; set; }
 }
 
 public class BonusResult

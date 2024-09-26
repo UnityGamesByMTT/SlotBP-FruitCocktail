@@ -15,7 +15,7 @@ public class ImageAnimation : MonoBehaviour
 
 	public List<Sprite> textureArray;
 
-	public Image rendererDelegate;
+	[SerializeField] private Image rendererDelegate;
 
 	public bool useSharedMaterial = true;
 
@@ -40,7 +40,6 @@ public class ImageAnimation : MonoBehaviour
 
 	[SerializeField] internal bool isplaying;
 
-	[SerializeField]
 	private Sprite OriginalSprite;
 
 	private void Awake()
@@ -53,6 +52,7 @@ public class ImageAnimation : MonoBehaviour
 
 	private void Start()
 	{
+		rendererDelegate = GetComponent<Image>();
 		OriginalSprite = rendererDelegate.sprite;
 	}
 
