@@ -29,7 +29,6 @@ public class BonusGame : MonoBehaviour
     [SerializeField]
     private Transform[] Slot_Transform;
 
-
     int tweenHeight = 0;  //calculate the height at which tweening is done
 
     [SerializeField]
@@ -56,34 +55,44 @@ public class BonusGame : MonoBehaviour
     private SocketIOManager SocketManager;
     [SerializeField] private SlotBehaviour slotBehaviour;
 
-    [SerializeField] private List<int> InitalizeList = new List<int>();
-
     [SerializeField] private int stopIndex;
     [SerializeField] private Sprite exitSprite;
     [SerializeField] private GameObject bonusGame;
     [SerializeField] private List<Transform> OuterReelSlots;
     [SerializeField] private GameObject OuterSlotItemPrefab;
-    [SerializeField] private List<int> verticalList;
-    [SerializeField] private List<int> horizontalList;
 
     [SerializeField] private List<OuterReelItem> Outer_Reel_All_Item;
     [SerializeField] private GameObject lighting;
 
-    [SerializeField] private TMP_Text currentBet;
-    [SerializeField] private TMP_Text creditAmount;
-    [SerializeField] private TMP_Text multiplier;
+    [SerializeField] private GameManager m_GameManager;
+
+    [Header("Data Update Section")]
+    [SerializeField] private TMP_Text m_Lives;
+    [SerializeField] private TMP_Text m_Amount;
+    [SerializeField] private TMP_Text m_TotalWonAmount;
+
     [SerializeField] private List<int> animIndex = new List<int>();
     [SerializeField] private int m_SpaceFactor;
 
-    [SerializeField] private List<IconPos> OuterIconsPosition;
+    [Header("Outer Reel References Section")]
+    [SerializeField] private List<OuterReelItem> m_FruitCockTail;
+    [SerializeField] private List<OuterReelItem> m_WaterMelon;
+    [SerializeField] private List<OuterReelItem> m_Peer;
+    [SerializeField] private List<OuterReelItem> m_Coconut;
+    [SerializeField] private List<OuterReelItem> m_Pineapple;
+    [SerializeField] private List<OuterReelItem> m_Orange;
+    [SerializeField] private List<OuterReelItem> m_Cherry;
+    [SerializeField] private List<OuterReelItem> m_Exit;
+
+    [SerializeField] private GameObject m_StopGameobject;
+    [SerializeField] private GameObject m_BonusWonPopup;
 
     BonusResult m_DefaultStructure;
     BonusResult m_ReceivedStructure;
 
     private bool ison = true;
     public List<int> resultnum = new List<int>();
-    private int resultmult = 0;
-    private double bet = 0;
+    private int Lives = 0;
     private int N_SpinCount_Begin = 0;
     private int N_SpinCount = 0;
     private Coroutine m_Spinning;
@@ -110,16 +119,13 @@ public class BonusGame : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.B))
         {
             StartBonus(m_DefaultStructure.winings.Count, m_DefaultStructure);
+            StartBonusGame();
         }
     }
 
-    internal void StartBonus(int m_count, BonusResult m_BonusData)
+    internal void StartBonusGame()
     {
-        Debug.Log(m_count);
         bonusGame.SetActive(true);
-        m_ReceivedStructure = m_BonusData;
-        N_SpinCount = m_count;
-
         if (!IsSpinning)
         {
             IsSpinning = true;
@@ -131,6 +137,16 @@ public class BonusGame : MonoBehaviour
             }
             m_Spinning = StartCoroutine(AutoSpinCoroutine());
         }
+    }
+
+    internal void StartBonus(int m_count, BonusResult m_BonusData)
+    {
+        m_ReceivedStructure = m_BonusData;
+        N_SpinCount = m_count;
+        m_StopGameobject = null;
+        N_SpinCount_Begin = 0;
+        Lives = m_ReceivedStructure.outerRingSymbol.Count(x => x == 7);
+        m_TotalWonAmount.text = m_ReceivedStructure.totalWinAmount.ToString();
     }
 
     //starts the spin process
@@ -159,6 +175,8 @@ public class BonusGame : MonoBehaviour
 
     private IEnumerator AutoSpinCoroutine()
     {
+        yield return new WaitForSeconds(0.4f);
+
         for(int i = 0; i < N_SpinCount; i ++)
         {
             StartSlots(IsSpinning);
@@ -166,6 +184,11 @@ public class BonusGame : MonoBehaviour
         }
 
         yield return new WaitForSeconds(0.2f);
+
+        bonusGame.SetActive(false);
+        m_GameManager.m_PushObject(m_BonusWonPopup);
+
+        yield return new WaitForSeconds(3f);
 
         StopAutoSpin();
         Reset();
@@ -196,9 +219,13 @@ public class BonusGame : MonoBehaviour
     private IEnumerator TweenRoutine()
     {
         IsSpinning = true;
-        currentBet.text = bet.ToString();
-        Coroutine moveSelector = StartCoroutine(ToggleSelectorAnimation(0.05f, 2));
+        StopInnerAnimations();
+        m_Lives.text = Lives.ToString();
+
+        Coroutine moveSelector = StartCoroutine(ToggleSelectorAnimation(0.08f, 2));
+
         yield return new WaitForSeconds(0.1f);
+
         for (int i = 0; i < numberOfSlots; i++)
         {
             InitializeTweening(Slot_Transform[i]);
@@ -206,6 +233,8 @@ public class BonusGame : MonoBehaviour
         }
 
         yield return new WaitForSeconds(0.5f);
+
+        m_StopGameobject = PopulateOuterMatrix(m_ReceivedStructure.outerRingSymbol[N_SpinCount_Begin]);
 
         PopulateInnerMatrix();
 
@@ -215,10 +244,17 @@ public class BonusGame : MonoBehaviour
         }
 
         yield return moveSelector;
+
+        m_Lives.text = Lives.ToString();
+
+        if(m_ReceivedStructure.outerRingSymbol[N_SpinCount_Begin - 1] != 7)
+        {
+            PlayInnerAnimations();
+        }
+
         CheckPayoutLineBackend(resultnum);
 
-        creditAmount.text = (resultmult * bet).ToString();
-        multiplier.text = "x " + resultmult.ToString();
+        m_Amount.text = (m_ReceivedStructure.winings[N_SpinCount_Begin - 1]).ToString();
 
         yield return new WaitForSeconds(3f);
         KillAllTweens();
@@ -260,25 +296,16 @@ public class BonusGame : MonoBehaviour
     private void Reset()
     {
         StopGameAnimation();
+        ResetHighlights();
+        m_GameManager.m_PopObject();
+    }
 
-        foreach (Transform item in OuterReelSlots)
-        {
-            for (int i = item.childCount - 1; i >= 0; i--)
-            {
-                Destroy(item.GetChild(i).gameObject);
-            }
-        }
-
-        resultnum.Clear();
-        animIndex.Clear();
-        Outer_Reel_All_Item.Clear();
+    private void ResetHighlights()
+    {
         foreach (OuterReelItem item in Outer_Reel_All_Item)
         {
             item.selector.SetActive(false);
-
         }
-
-        bonusGame.SetActive(false);
     }
 
     private void PopulateInnerMatrix()
@@ -286,6 +313,7 @@ public class BonusGame : MonoBehaviour
         for(int i = 0; i < Tempimages.Count; i++)
         {
             Tempimages[i].slotImages[0].transform.GetChild(0).GetComponent<Image>().sprite = myImages[m_ReceivedStructure.innerMatrix[N_SpinCount_Begin][i]];
+            Tempimages[i].slotImages[0].GetComponent<OuterReelItem>().image.GetComponent<ImageAnimation>().textureArray = GetSpriteList(m_ReceivedStructure.innerMatrix[N_SpinCount_Begin][i]).ToList();
         }
         if(N_SpinCount_Begin < N_SpinCount)
         {
@@ -293,9 +321,81 @@ public class BonusGame : MonoBehaviour
         }
     }
 
-    private void PopulateOuterMatrix()
+    private Sprite[] GetSpriteList(int m_value)
     {
+        switch (m_value)
+        {
+            case 0://FRUITCOCKTAIL
+                return slotBehaviour.Juice_Sprite;
+            case 1://WATERMELON
+                return slotBehaviour.Watermelon_Sprite;
+            case 2://PEER
+                return slotBehaviour.Pear_Sprite;
+            case 3://COCONUT
+                return slotBehaviour.Coconut_Sprite;
+            case 4://PINEAPPLE
+                return slotBehaviour.Pineapple_Sprite;
+            case 5://ORANGE
+                return slotBehaviour.Orange_Sprite;
+            case 6://CHERRY
+                return slotBehaviour.Cherry_Sprite;
+            case 7://EXIT
+                break;
+        }
+        return null;
+    }
 
+    private void PlayInnerAnimations()
+    {
+        for(int i = 0; i < Tempimages.Count; i++)
+        {
+            Tempimages[i].slotImages[0].GetComponent<OuterReelItem>().image.GetComponent<ImageAnimation>().StartAnimation();
+        }
+    }
+
+    private void StopInnerAnimations()
+    {
+        for (int i = 0; i < Tempimages.Count; i++)
+        {
+            Tempimages[i].slotImages[0].GetComponent<OuterReelItem>().image.GetComponent<ImageAnimation>().StopAnimation();
+            Tempimages[i].slotImages[0].GetComponent<OuterReelItem>().image.GetComponent<ImageAnimation>().textureArray.Clear();
+            Tempimages[i].slotImages[0].GetComponent<OuterReelItem>().image.GetComponent<ImageAnimation>().textureArray.TrimExcess();
+        }
+    }
+
+    private GameObject PopulateOuterMatrix(int m_value)
+    {
+        int random_index;
+        switch (m_value)
+        {
+            case 0://FRUITCOCKTAIL
+                random_index = UnityEngine.Random.Range(0, m_FruitCockTail.Count);
+                return m_FruitCockTail[random_index].gameObject;
+            case 1://WATERMELON
+                random_index = UnityEngine.Random.Range(0, m_WaterMelon.Count);
+                return m_WaterMelon[random_index].gameObject;
+            case 2://PEER
+                random_index = UnityEngine.Random.Range(0, m_Peer.Count);
+                return m_Peer[random_index].gameObject;
+            case 3://COCONUT
+                random_index = UnityEngine.Random.Range(0, m_Coconut.Count);
+                return m_Coconut[random_index].gameObject;
+            case 4://PINEAPPLE
+                random_index = UnityEngine.Random.Range(0, m_Pineapple.Count);
+                return m_Pineapple[random_index].gameObject;
+            case 5://ORANGE
+                random_index = UnityEngine.Random.Range(0, m_Orange.Count);
+                return m_Orange[random_index].gameObject;
+            case 6://CHERRY
+                random_index = UnityEngine.Random.Range(0, m_Cherry.Count);
+                return m_Cherry[random_index].gameObject;
+            case 7://EXIT
+                random_index = UnityEngine.Random.Range(0, m_Exit.Count);
+                Lives--;
+                return m_Exit[random_index].gameObject;
+        }
+
+        return null;
     }
 
     #region [[===TWEENING CODE===]]
@@ -337,26 +437,41 @@ public class BonusGame : MonoBehaviour
     //HACK: This coroutine is used to run the border of the boxes one after another.
     IEnumerator ToggleSelectorAnimation(float delay, int noOfRotation = 1)
     {
+        int count = 0;
+        ResetHighlights();
         for (int j = 0; j < noOfRotation + 1; j++)
         {
             for(int i = Outer_Reel_All_Item.Count - 1; i > 0; i--)
             {
                 Outer_Reel_All_Item[i].selector.SetActive(true);
-                if (j == noOfRotation && Outer_Reel_All_Item[i].id == stopIndex)
+                if (j == noOfRotation && Outer_Reel_All_Item[i].gameObject == m_StopGameobject)
                 {
-
+                    Outer_Reel_All_Item[i].selector.SetActive(true);
                     slotBehaviour.CheckPopups = false;
+                    yield return new WaitForSeconds(0.2f);
                     yield break;
                 }
-                yield return new WaitForSeconds(delay);
+                if (j < noOfRotation)
+                {
+                    yield return new WaitForSeconds(delay);
+                }
+                else
+                {
+                    count = 0;
+                    if(count < 4)
+                    {
+                        count++;
+                        yield return new WaitForSeconds(delay * 2f);
+                    }
+                    else
+                    {
+                        yield return new WaitForSeconds(delay * 4f);
+                    }
+                }
                 Outer_Reel_All_Item[i].selector.SetActive(false);
             }
         }
+        yield return new WaitForSeconds(0.6f);
     }
     #endregion
-
-    private struct IconPos
-    {
-        public List<OuterReelItem> m_Icons;
-    }
 }

@@ -58,27 +58,27 @@ public class SlotBehaviour : MonoBehaviour
     //[SerializeField]
     //private Sprite[] Bonus_Sprite;
     [SerializeField]
-    private Sprite[] Apple_sprite;
+    internal Sprite[] Apple_sprite;
     [SerializeField]
-    private Sprite[] Cherry_Sprite;
+    internal Sprite[] Cherry_Sprite;
     [SerializeField]
-    private Sprite[] Coconut_Sprite;
+    internal Sprite[] Coconut_Sprite;
     [SerializeField]
-    private Sprite[] Jelly_Sprite;
+    internal Sprite[] Jelly_Sprite;
     [SerializeField]
-    private Sprite[] Juice_Sprite;
+    internal Sprite[] Juice_Sprite;
     [SerializeField]
-    private Sprite[] Lemon_Sprite;
+    internal Sprite[] Lemon_Sprite;
     [SerializeField]
-    private Sprite[] Orange_Sprite;
+    internal Sprite[] Orange_Sprite;
     [SerializeField]
-    private Sprite[] Pear_Sprite;
+    internal Sprite[] Pear_Sprite;
     [SerializeField]
-    private Sprite[] Pineapple_Sprite;
+    internal Sprite[] Pineapple_Sprite;
     [SerializeField]
-    private Sprite[] Strawberry_Sprite;
+    internal Sprite[] Strawberry_Sprite;
     [SerializeField]
-    private Sprite[] Watermelon_Sprite;
+    internal Sprite[] Watermelon_Sprite;
 
 
     [Header("Miscellaneous UI")]
@@ -110,6 +110,8 @@ public class SlotBehaviour : MonoBehaviour
     [SerializeField] private BonusGame bonusManager;
     [SerializeField] private SocketIOManager SocketManager;
     [SerializeField] private UIManager uiManager;
+    [SerializeField] private GameManager m_GameManager;
+
     private List<Tweener> alltweens = new List<Tweener>();
 
 
@@ -379,62 +381,63 @@ public class SlotBehaviour : MonoBehaviour
                 animScript.AnimationSpeed = 15f;
                 break;
             case 3:
-                for (int i = 0; i < Jelly_Sprite.Length; i++)
-                {
-                    animScript.textureArray.Add(Jelly_Sprite[i]);
-                }
-                animScript.AnimationSpeed = 12f;
-                break;
-            case 4:
-                for (int i = 0; i < Juice_Sprite.Length; i++)
-                {
-                    animScript.textureArray.Add(Juice_Sprite[i]);
-                }
-                animScript.AnimationSpeed = 12f;
-                break;
-            case 5:
                 for (int i = 0; i < Lemon_Sprite.Length; i++)
                 {
                     animScript.textureArray.Add(Lemon_Sprite[i]);
                 }
                 animScript.AnimationSpeed = 12f;
                 break;
-            case 6:
+            case 4:
                 for (int i = 0; i < Orange_Sprite.Length; i++)
                 {
                     animScript.textureArray.Add(Orange_Sprite[i]);
                 }
                 animScript.AnimationSpeed = 12f;
                 break;
-            case 7:
+            case 5:
                 for (int i = 0; i < Pear_Sprite.Length; i++)
                 {
                     animScript.textureArray.Add(Pear_Sprite[i]);
                 }
                 animScript.AnimationSpeed = 12f;
                 break;
-            case 8:
+            case 6:
                 for (int i = 0; i < Pineapple_Sprite.Length; i++)
                 {
                     animScript.textureArray.Add(Pineapple_Sprite[i]);
                 }
                 animScript.AnimationSpeed = 12f;
                 break;
-            case 9:
+            case 7:
                 for (int i = 0; i < Strawberry_Sprite.Length; i++)
                 {
                     animScript.textureArray.Add(Strawberry_Sprite[i]);
                 }
                 animScript.AnimationSpeed = 12f;
                 break;
-            case 10:
+            case 8:
+                break;
+            case 9:
                 for (int i = 0; i < Watermelon_Sprite.Length; i++)
                 {
                     animScript.textureArray.Add(Watermelon_Sprite[i]);
                 }
                 animScript.AnimationSpeed = 12f;
                 break;
-
+            case 10:
+                for (int i = 0; i < Juice_Sprite.Length; i++)
+                {
+                    animScript.textureArray.Add(Juice_Sprite[i]);
+                }
+                animScript.AnimationSpeed = 12f;
+                break;
+            case 11:
+                for (int i = 0; i < Jelly_Sprite.Length; i++)
+                {
+                    animScript.textureArray.Add(Jelly_Sprite[i]);
+                }
+                animScript.AnimationSpeed = 12f;
+                break;
         }
     }
 
@@ -591,6 +594,7 @@ public class SlotBehaviour : MonoBehaviour
     {
         if (SocketManager.resultData.isBonus)
         {
+            m_GameManager.m_PushObject(m_GameManager.m_Bonus_Start_Object);
             bonusManager.StartBonus(SocketManager.resultData.BonusResult.winings.Count, SocketManager.resultData.BonusResult);
         }
         else

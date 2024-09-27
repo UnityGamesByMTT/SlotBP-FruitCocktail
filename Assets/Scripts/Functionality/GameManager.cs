@@ -11,6 +11,9 @@ public class GameManager : MonoBehaviour
     [Header("Reference For UI Manager")]
     [SerializeField] private UIManager m_UIManager;
 
+    [Header("References For Bonus Game Manager")]
+    [SerializeField] private BonusGame m_BonusGame;
+
     [Header("Menu Buttons References")]
     [SerializeField] private Button m_Paytable_Button;
     [SerializeField] private Button m_Rules_Button;
@@ -19,12 +22,15 @@ public class GameManager : MonoBehaviour
 
     [Header("Quit Popup Button References")]
     [SerializeField] private Button m_Quit_Confirm_Button;
+    [SerializeField] private Button m_Start_Bonus_Button;
 
     [Header("Menu Panel References")]
     [SerializeField] private GameObject m_Paytable_Object;
     [SerializeField] private GameObject m_Rules_Object;
     [SerializeField] private GameObject m_Settings_Object;
     [SerializeField] private GameObject m_Quit_Object;
+
+    [SerializeField] internal GameObject m_Bonus_Start_Object;
 
     //NOTE: internal Booleans
     internal bool isExit = false;
@@ -47,6 +53,9 @@ public class GameManager : MonoBehaviour
 
         if (m_Quit_Button) m_Quit_Button.onClick.RemoveAllListeners();
         if (m_Quit_Button) m_Quit_Button.onClick.AddListener(() => { m_PushObject(m_Quit_Object); });
+
+        if (m_Start_Bonus_Button) m_Start_Bonus_Button.onClick.RemoveAllListeners();
+        if (m_Start_Bonus_Button) m_Start_Bonus_Button.onClick.AddListener(() => { m_PopObject(); m_BonusGame.StartBonusGame(); });
 
         if (m_Quit_Confirm_Button) m_Quit_Confirm_Button.onClick.RemoveAllListeners();
         if (m_Quit_Confirm_Button) m_Quit_Confirm_Button.onClick.AddListener(() => { m_UIManager.CallOnExitFunction(); isExit = true; });
