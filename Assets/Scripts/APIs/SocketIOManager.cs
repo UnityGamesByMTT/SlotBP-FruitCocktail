@@ -36,7 +36,7 @@ public class SocketIOManager : MonoBehaviour
 
     [SerializeField]
     private string TestToken;
-    protected string gameID = "";
+    protected string gameID = "SL-FC";
 
     internal bool isLoaded = false;
     internal bool SetInit = false;
@@ -316,6 +316,7 @@ public class SocketIOManager : MonoBehaviour
 
         slotManager.SetInitialUI();
 
+        isLoaded = true;
         Application.ExternalCall("window.parent.postMessage", "OnEnter", "*");
     }
 

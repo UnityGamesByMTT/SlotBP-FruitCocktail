@@ -118,13 +118,13 @@ public class ImageAnimation : MonoBehaviour
 
 	private void SetTextureOfIndex()
 	{
-		if (useSharedMaterial)
-		{
 			rendererDelegate.sprite = textureArray[indexOfTexture];
-		}
-		else
-		{
-			rendererDelegate.sprite = textureArray[indexOfTexture];
-		}
+		//if (useSharedMaterial)
+		//{
+		//}
+		//else
+		//{
+		//	rendererDelegate.sprite = textureArray[indexOfTexture];
+		//}
 	}
 }

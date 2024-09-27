@@ -84,6 +84,8 @@ public class BonusGame : MonoBehaviour
     [SerializeField] private List<OuterReelItem> m_Cherry;
     [SerializeField] private List<OuterReelItem> m_Exit;
 
+    [SerializeField] private List<TMP_Text> m_BonusPayText = new List<TMP_Text>();
+
     [SerializeField] private GameObject m_StopGameobject;
     [SerializeField] private GameObject m_BonusWonPopup;
 
@@ -396,6 +398,14 @@ public class BonusGame : MonoBehaviour
         }
 
         return null;
+    }
+
+    internal void PopulateBonusPaytable(List<string> m_data)
+    {
+        for(int k = 0; k < m_data.Count; k++)
+        {
+            m_BonusPayText[k].text = m_data[k];
+        }
     }
 
     #region [[===TWEENING CODE===]]

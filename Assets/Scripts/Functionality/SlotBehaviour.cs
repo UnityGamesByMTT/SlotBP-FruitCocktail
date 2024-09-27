@@ -296,14 +296,16 @@ public class SlotBehaviour : MonoBehaviour
 
     private void MaxBet()
     {
-        if (audioController) audioController.PlayButtonAudio();
+        if (audioController.m_Player_Listener.enabled) audioController.m_Click_Audio.Play();
+
         BetCounter = SocketManager.initialData.Bets.Count - 1;
         if (TotalBet_text) TotalBet_text.text = SocketManager.initialData.Bets[BetCounter].ToString();
     }
 
     private void ChangeBet(bool IncDec)
     {
-        if (audioController) audioController.PlayButtonAudio();
+        if (audioController.m_Player_Listener.enabled) audioController.m_Click_Audio.Play();
+
         if (IncDec)
         {
             if (BetCounter < SocketManager.initialData.Bets.Count - 1)
@@ -340,8 +342,8 @@ public class SlotBehaviour : MonoBehaviour
         if (Lines_text) Lines_text.text = (SocketManager.initialData.Bets[BetCounter] * Lines).ToString();
         if (TotalWin_text) TotalWin_text.text = SocketManager.playerdata.haveWon.ToString();
         if (Balance_text) Balance_text.text = (SocketManager.playerdata.Balance).ToString();
-        //_bonusManager.PopulateWheel(SocketManager.bonusdata);
         uiManager.InitialiseUIData(SocketManager.initUIData.AbtLogo.link, SocketManager.initUIData.AbtLogo.logoSprite, SocketManager.initUIData.ToULink, SocketManager.initUIData.PopLink, SocketManager.initUIData.paylines, SocketManager.initUIData.spclSymbolTxt);
+        bonusManager.PopulateBonusPaytable(SocketManager.bonusdata);
     }
 
     //reset the layout after populating the slots
@@ -444,7 +446,7 @@ public class SlotBehaviour : MonoBehaviour
     //starts the spin process
     private void StartSlots(bool autoSpin = false)
     {
-        if (audioController) audioController.PlayWLAudio("spin");
+        if (audioController.m_Player_Listener.enabled) audioController.m_Spin_Audio.Play();
 
         if (!autoSpin)
         {
@@ -648,7 +650,7 @@ public class SlotBehaviour : MonoBehaviour
         List<int> points_anim = null;
         if (LineId.Count > 0)
         {
-            if (audioController) audioController.PlayWLAudio("win");
+            if (audioController.m_Player_Listener.enabled) audioController.m_Win_Audio.Play();
 
             for (int i = 0; i < LineId.Count; i++)
             {
@@ -689,7 +691,7 @@ public class SlotBehaviour : MonoBehaviour
         else
         {
 
-            if (audioController) audioController.PlayWLAudio("lose");
+            if (audioController.m_Player_Listener.enabled) audioController.m_LooseAudio.Play();
         }
     }
 

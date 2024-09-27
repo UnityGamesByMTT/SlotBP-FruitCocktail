@@ -237,14 +237,14 @@ public class UIManager : MonoBehaviour
 
     private void OpenPopup(GameObject Popup)
     {
-        if (audioController) audioController.PlayButtonAudio();
+        if (audioController.m_Player_Listener.enabled) audioController.m_Click_Audio.Play();
         if (Popup) Popup.SetActive(true);
         if (MainPopup_Object) MainPopup_Object.SetActive(true);
     }
 
     private void ClosePopup(GameObject Popup)
     {
-        if (audioController) audioController.PlayButtonAudio();
+        if (audioController.m_Player_Listener.enabled) audioController.m_Click_Audio.Play();
         if (Popup) Popup.SetActive(false);
         if (MainPopup_Object) MainPopup_Object.SetActive(false);
     }
