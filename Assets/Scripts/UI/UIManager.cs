@@ -80,7 +80,7 @@ public class UIManager : MonoBehaviour
     private void Start()
     {
         if (SettingsExit_Button) SettingsExit_Button.onClick.RemoveAllListeners();
-        if (SettingsExit_Button) SettingsExit_Button.onClick.AddListener(delegate { ClosePopup(SettingsPopup_Object); });
+        if (SettingsExit_Button) SettingsExit_Button.onClick.AddListener(delegate { ClosePopup(SettingsPopup_Object); m_GameManager.m_AudioController.m_Click_Audio.Play(); });
 
         if (MusicOn_Object) MusicOn_Object.SetActive(true);
         if (MusicOff_Object) MusicOff_Object.SetActive(false);
@@ -89,10 +89,10 @@ public class UIManager : MonoBehaviour
         if (SoundOff_Object) SoundOff_Object.SetActive(false);
 
         if (m_OpenMenu) m_OpenMenu.onClick.RemoveAllListeners();
-        if (m_OpenMenu) m_OpenMenu.onClick.AddListener(delegate { OpenCloseMenu(true); });
+        if (m_OpenMenu) m_OpenMenu.onClick.AddListener(delegate { OpenCloseMenu(true); m_GameManager.m_AudioController.m_Click_Audio.Play(); });
 
         if (m_CloseMenu) m_CloseMenu.onClick.RemoveAllListeners();
-        if (m_CloseMenu) m_CloseMenu.onClick.AddListener(delegate { OpenCloseMenu(false); });
+        if (m_CloseMenu) m_CloseMenu.onClick.AddListener(delegate { OpenCloseMenu(false); m_GameManager.m_AudioController.m_Click_Audio.Play(); });
 
         //if (FreeSpin_Button) FreeSpin_Button.onClick.RemoveAllListeners();
         //if (FreeSpin_Button) FreeSpin_Button.onClick.AddListener(delegate { StartFreeSpins(FreeSpins); });
