@@ -91,10 +91,7 @@ public class SlotBehaviour : MonoBehaviour
     [SerializeField]
     private TMP_Text TotalWin_text;
 
-
-
     [Header("Audio Management")]
-
     [SerializeField] private AudioController audioController;
 
     [Header("paylines ")]
@@ -114,6 +111,7 @@ public class SlotBehaviour : MonoBehaviour
 
     private List<Tweener> alltweens = new List<Tweener>();
 
+    [SerializeField] private List<TMP_Text> m_BonusPayText = new List<TMP_Text>();
 
     [SerializeField]
     private List<ImageAnimation> TempList;  //stores the sprites whose animation is running at present 
@@ -150,27 +148,27 @@ public class SlotBehaviour : MonoBehaviour
     {
         IsAutoSpin = false;
         if (SlotStart_Button) SlotStart_Button.onClick.RemoveAllListeners();
-        if (SlotStart_Button) SlotStart_Button.onClick.AddListener(delegate { StartSlots(); });
+        if (SlotStart_Button) SlotStart_Button.onClick.AddListener(delegate { StartSlots(); m_GameManager.m_AudioController.m_Spin_Button_Clicked.Play(); });
 
         if (BetPlus_Button) BetPlus_Button.onClick.RemoveAllListeners();
-        if (BetPlus_Button) BetPlus_Button.onClick.AddListener(delegate { ChangeBet(true); });
+        if (BetPlus_Button) BetPlus_Button.onClick.AddListener(delegate { ChangeBet(true); m_GameManager.m_AudioController.m_Click_Audio.Play(); });
         if (BetMinus_Button) BetMinus_Button.onClick.RemoveAllListeners();
-        if (BetMinus_Button) BetMinus_Button.onClick.AddListener(delegate { ChangeBet(false); });
+        if (BetMinus_Button) BetMinus_Button.onClick.AddListener(delegate { ChangeBet(false); m_GameManager.m_AudioController.m_Click_Audio.Play(); });
 
         if (LinePlus_Button) LinePlus_Button.onClick.RemoveAllListeners();
-        if (LinePlus_Button) LinePlus_Button.onClick.AddListener(delegate { ChangeBet(true); });
+        if (LinePlus_Button) LinePlus_Button.onClick.AddListener(delegate { ChangeBet(true); m_GameManager.m_AudioController.m_Click_Audio.Play(); });
         if (LineMinus_Button) LineMinus_Button.onClick.RemoveAllListeners();
-        if (LineMinus_Button) LineMinus_Button.onClick.AddListener(delegate { ChangeBet(false); });
+        if (LineMinus_Button) LineMinus_Button.onClick.AddListener(delegate { ChangeBet(false); m_GameManager.m_AudioController.m_Click_Audio.Play(); });
 
         if (MaxBet_Button) MaxBet_Button.onClick.RemoveAllListeners();
         if (MaxBet_Button) MaxBet_Button.onClick.AddListener(MaxBet);
 
         if (AutoSpin_Button) AutoSpin_Button.onClick.RemoveAllListeners();
-        if (AutoSpin_Button) AutoSpin_Button.onClick.AddListener(AutoSpin);
+        if (AutoSpin_Button) AutoSpin_Button.onClick.AddListener(delegate { AutoSpin(); m_GameManager.m_AudioController.m_Spin_Button_Clicked.Play(); });
 
 
         if (AutoSpinStop_Button) AutoSpinStop_Button.onClick.RemoveAllListeners();
-        if (AutoSpinStop_Button) AutoSpinStop_Button.onClick.AddListener(StopAutoSpin);
+        if (AutoSpinStop_Button) AutoSpinStop_Button.onClick.AddListener(delegate { StopAutoSpin(); m_GameManager.m_AudioController.m_Click_Audio.Play(); });
 
         tweenHeight = (myImages.Length * IconSizeFactor) - 280;
     }
@@ -327,13 +325,13 @@ public class SlotBehaviour : MonoBehaviour
 
 
     //just for testing purposes delete on production
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && SlotStart_Button.interactable)
-        {
-            StartSlots();
-        }
-    }
+    //private void Update()
+    //{
+    //    if (Input.GetKeyDown(KeyCode.Space) && SlotStart_Button.interactable)
+    //    {
+    //        StartSlots();
+    //    }
+    //}
 
     internal void SetInitialUI()
     {
@@ -343,7 +341,12 @@ public class SlotBehaviour : MonoBehaviour
         if (TotalWin_text) TotalWin_text.text = SocketManager.playerdata.haveWon.ToString();
         if (Balance_text) Balance_text.text = (SocketManager.playerdata.Balance).ToString();
         uiManager.InitialiseUIData(SocketManager.initUIData.AbtLogo.link, SocketManager.initUIData.AbtLogo.logoSprite, SocketManager.initUIData.ToULink, SocketManager.initUIData.PopLink, SocketManager.initUIData.paylines, SocketManager.initUIData.spclSymbolTxt);
-        bonusManager.PopulateBonusPaytable(SocketManager.bonusdata);
+        //bonusManager.PopulateBonusPaytable(SocketManager.bonusdata);
+
+        for(int i = 0; i < m_BonusPayText.Count; i++)
+        {
+            m_BonusPayText[i].text = SocketManager.bonusdata[i].ToString() + " x";
+        }
     }
 
     //reset the layout after populating the slots
@@ -418,6 +421,11 @@ public class SlotBehaviour : MonoBehaviour
                 animScript.AnimationSpeed = 12f;
                 break;
             case 8:
+                for (int i = 0; i < Strawberry_Sprite.Length; i++)
+                {
+                    animScript.textureArray.Add(Strawberry_Sprite[i]);
+                }
+                animScript.AnimationSpeed = 12f;
                 break;
             case 9:
                 for (int i = 0; i < Watermelon_Sprite.Length; i++)
@@ -535,6 +543,8 @@ public class SlotBehaviour : MonoBehaviour
 
         yield return new WaitForSeconds(0.3f);
 
+        m_GameManager.m_AudioController.m_Spin_Audio.Stop();
+
         //TODO: To Be Uncommented When Move To Publishing
         CheckPayoutLineBackend(SocketManager.resultData.linesToEmit, SocketManager.resultData.FinalsymbolsToEmit, SocketManager.resultData.jackpot);
         KillAllTweens();
@@ -596,6 +606,7 @@ public class SlotBehaviour : MonoBehaviour
     {
         if (SocketManager.resultData.isBonus)
         {
+            m_GameManager.m_AudioController.m_Bonus_Audio.Play();
             m_GameManager.m_PushObject(m_GameManager.m_Bonus_Start_Object);
             bonusManager.StartBonus(SocketManager.resultData.BonusResult.winings.Count, SocketManager.resultData.BonusResult);
         }

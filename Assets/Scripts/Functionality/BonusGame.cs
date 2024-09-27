@@ -84,8 +84,6 @@ public class BonusGame : MonoBehaviour
     [SerializeField] private List<OuterReelItem> m_Cherry;
     [SerializeField] private List<OuterReelItem> m_Exit;
 
-    [SerializeField] private List<TMP_Text> m_BonusPayText = new List<TMP_Text>();
-
     [SerializeField] private GameObject m_StopGameobject;
     [SerializeField] private GameObject m_BonusWonPopup;
 
@@ -116,17 +114,19 @@ public class BonusGame : MonoBehaviour
     }
 
     //just for testing purposes delete on production
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            StartBonus(m_DefaultStructure.winings.Count, m_DefaultStructure);
-            StartBonusGame();
-        }
-    }
+    //private void Update()
+    //{
+    //    if (Input.GetKeyDown(KeyCode.B))
+    //    {
+    //        StartBonus(m_DefaultStructure.winings.Count, m_DefaultStructure);
+    //        StartBonusGame();
+    //    }
+    //}
 
     internal void StartBonusGame()
     {
+        m_GameManager.m_AudioController.m_BG_Audio.Stop();
+        m_GameManager.m_AudioController.m_Bonus_BG_Audio.Play();
         bonusGame.SetActive(true);
         if (!IsSpinning)
         {
@@ -188,6 +188,7 @@ public class BonusGame : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         bonusGame.SetActive(false);
+        m_GameManager.m_AudioController.m_Bonus_Audio.Play();
         m_GameManager.m_PushObject(m_BonusWonPopup);
 
         yield return new WaitForSeconds(3f);
@@ -224,6 +225,8 @@ public class BonusGame : MonoBehaviour
         StopInnerAnimations();
         m_Lives.text = Lives.ToString();
 
+        m_GameManager.m_AudioController.m_Spin_Audio.Play();
+
         Coroutine moveSelector = StartCoroutine(ToggleSelectorAnimation(0.08f, 2));
 
         yield return new WaitForSeconds(0.1f);
@@ -246,6 +249,8 @@ public class BonusGame : MonoBehaviour
         }
 
         yield return moveSelector;
+
+        m_GameManager.m_AudioController.m_Spin_Audio.Stop();
 
         m_Lives.text = Lives.ToString();
 
@@ -300,6 +305,8 @@ public class BonusGame : MonoBehaviour
         StopGameAnimation();
         ResetHighlights();
         m_GameManager.m_PopObject();
+        m_GameManager.m_AudioController.m_Bonus_BG_Audio.Stop();
+        m_GameManager.m_AudioController.m_BG_Audio.Play();
     }
 
     private void ResetHighlights()
@@ -398,14 +405,6 @@ public class BonusGame : MonoBehaviour
         }
 
         return null;
-    }
-
-    internal void PopulateBonusPaytable(List<string> m_data)
-    {
-        for(int k = 0; k < m_data.Count; k++)
-        {
-            m_BonusPayText[k].text = m_data[k];
-        }
     }
 
     #region [[===TWEENING CODE===]]

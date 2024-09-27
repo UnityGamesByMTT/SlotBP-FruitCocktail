@@ -20,6 +20,7 @@ public class ExitButton : MonoBehaviour
         m_GetCurrentButton.onClick.RemoveAllListeners();
         m_GetCurrentButton.onClick.AddListener(() =>
         {
+            m_GameManager.m_AudioController.m_Click_Audio.Play();
             if (!m_GameManager.isExit)
             {
                 m_GameManager.m_PopObject();

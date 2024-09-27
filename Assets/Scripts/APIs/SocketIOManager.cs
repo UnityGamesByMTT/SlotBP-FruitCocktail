@@ -51,11 +51,16 @@ public class SocketIOManager : MonoBehaviour
         OpenSocket();
     }
 
-    void ReceiveAuthToken(string authToken)
+    void ReceiveAuthToken(string jsonData)
     {
-        Debug.Log("Received authToken: " + authToken);
-        // Do something with the authToken
-        myAuth = authToken;
+        Debug.Log("Received data: " + jsonData);
+
+        // Parse the JSON data
+        var data = JsonUtility.FromJson<AuthTokenData>(jsonData);
+        SocketURI = data.socketURL;
+        myAuth = data.cookie;
+
+        // Proceed with connecting to the server using myAuth and socketURL
     }
 
     string myAuth = null;
@@ -256,7 +261,7 @@ public class SocketIOManager : MonoBehaviour
                     initialData = myData.message.GameData;
                     initUIData = myData.message.UIData;
                     playerdata = myData.message.PlayerData;
-                    //bonusdata = myData.message.BonusData;
+                    bonusdata = myData.message.BonusData;
 
                     if (!SetInit)
                     {
@@ -490,7 +495,7 @@ public class BonusResult
 public class Message
 {
     public GameData GameData { get; set; }
-    public List<object> BonusData { get; set; }
+    public List<string> BonusData { get; set; }
     public UIData UIData { get; set; }
     public PlayerData PlayerData { get; set; }
     public int maxGambleBet { get; set; }
@@ -618,4 +623,11 @@ public class FreeSpins
 {
     public int count { get; set; }
     public bool isNewAdded { get; set; }
+}
+
+[Serializable]
+public class AuthTokenData
+{
+    public string cookie;
+    public string socketURL;
 }
