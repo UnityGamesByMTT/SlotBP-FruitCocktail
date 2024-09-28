@@ -35,7 +35,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button Left_Arrow;
     [SerializeField] private Button Right_Arrow;
     [SerializeField] private GameObject[] paytableList;
-    [SerializeField] private int CurrentIndex = 0;
+    [SerializeField] internal int CurrentIndex = 0;
 
     [Header("Settings Popup")]
     [SerializeField]
@@ -108,6 +108,20 @@ public class UIManager : MonoBehaviour
         if (Music_Button) Music_Button.onClick.RemoveAllListeners();
         if (Music_Button) Music_Button.onClick.AddListener(ToggleMusic);
 
+        if (Left_Arrow) Left_Arrow.onClick.RemoveAllListeners();
+        if (Left_Arrow) Left_Arrow.onClick.AddListener(() =>
+        {
+            NextPrev(false);
+        });
+
+        if (Right_Arrow) Right_Arrow.onClick.RemoveAllListeners();
+        if (Right_Arrow) Right_Arrow.onClick.AddListener(() =>
+        {
+            NextPrev(true);
+        });
+
+        CurrentIndex = 0;
+        ActivatePaytable(CurrentIndex);
     }
 
     internal void PopulateWin(int value, double amount)
@@ -147,13 +161,13 @@ public class UIManager : MonoBehaviour
 
     private void StartPopupAnim(double amount)
     {
-        int initAmount = 0;
+        double initAmount = 0;
         //if (WinPopup_Object) WinPopup_Object.SetActive(true);
         if (MainPopup_Object) MainPopup_Object.SetActive(true);
 
-        DOTween.To(() => initAmount, (val) => initAmount = val, (int)amount, 2f).OnUpdate(() =>
+        DOTween.To(() => initAmount, (val) => initAmount = val, amount, 2f).OnUpdate(() =>
         {
-            if (megaWInText) megaWInText.text = initAmount.ToString();
+            if (megaWInText) megaWInText.text = initAmount.ToString("f3");
         });
 
         DOVirtual.DelayedCall(6f, () =>
@@ -189,12 +203,10 @@ public class UIManager : MonoBehaviour
 
     private void PopulateSymbolsPayout(Paylines paylines)
     {
-        Debug.Log(string.Concat("<color=brown><b>", "Length: " + paylines.symbols.Count, "</b></color>"));
         for (int i = 0; i < paylines.symbols.Count; i++)
         {
             string text = null;
-
-            try
+            if(i < paylines.symbols.Count - 4)
             {
                 if (paylines.symbols[i].Multiplier[0][0] != 0)
                 {
@@ -208,24 +220,29 @@ public class UIManager : MonoBehaviour
                 {
                     text += string.Concat("<color=#F8D229>", "\n3x - " + paylines.symbols[i].Multiplier[2][0], "</color>");
                 }
-                if (SymbolsText[i]) SymbolsText[i].text = text;
             }
-            catch
+            else
             {
-                switch(paylines.symbols[i].Name)
+                switch (paylines.symbols[i].Name.ToUpper())
                 {
-                    case "FREESPIN":
+                    //case "FREESPIN":
+                    //    text += paylines.symbols[i].description;
+                    //    break;
+                    case "WILD":
+                        text += paylines.symbols[i].description;
                         break;
                     case "SCATTER":
+                        text += paylines.symbols[i].description;
                         break;
                     case "JACKPOT":
-                        break;
-                    case "WILD":
+                        text += paylines.symbols[i].description;
                         break;
                     case "BONUS":
+                        text += paylines.symbols[i].description;
                         break;
                 }
             }
+            if (SymbolsText[i]) SymbolsText[i].text = text;
         }
     }
 
@@ -307,6 +324,51 @@ public class UIManager : MonoBehaviour
                 m_MenuButtonHolder.transform.GetChild(i).DOLocalMoveY(195, 0.3f);
             }
             m_OpenMenu.gameObject.SetActive(true);
+        }
+    }
+
+    private void NextPrev(bool m_np)
+    {
+        if (m_np)
+        {
+            CurrentIndex++;
+            ActivatePaytable(CurrentIndex);
+        }
+        else
+        {
+            CurrentIndex--;
+            ActivatePaytable(CurrentIndex);
+        }
+    }
+
+    internal void ActivatePaytable(int index)
+    {
+        for(int i = 0; i < paytableList.Length; i++)
+        {
+            if(i == index)
+            {
+                paytableList[i].SetActive(true);
+            }
+            else
+            {
+                paytableList[i].SetActive(false);
+            }
+        }
+
+        if(index == 0)
+        {
+            Left_Arrow.interactable = false;
+            Right_Arrow.interactable = true;
+        }
+        else if(index == paytableList.Length - 1)
+        {
+            Left_Arrow.interactable = true;
+            Right_Arrow.interactable = false;
+        }
+        else
+        {
+            Left_Arrow.interactable = true;
+            Right_Arrow.interactable = true;
         }
     }
 }

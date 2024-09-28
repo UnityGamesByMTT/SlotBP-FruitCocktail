@@ -137,7 +137,7 @@ public class SlotBehaviour : MonoBehaviour
     internal bool CheckPopups = false;
     private int BetCounter = 0;
 
-    static private int Lines = 9;
+    static private int Lines = 20;
     double bet = 0;
     double balance = 0;
 
@@ -319,8 +319,8 @@ public class SlotBehaviour : MonoBehaviour
             }
         }
 
-        if (TotalBet_text) TotalBet_text.text = SocketManager.initialData.Bets[BetCounter].ToString();
-        if (Lines_text) Lines_text.text = (SocketManager.initialData.Bets[BetCounter] * Lines).ToString();
+        if (TotalBet_text) TotalBet_text.text = (SocketManager.initialData.Bets[BetCounter] * Lines).ToString("f3");
+        if (Lines_text) Lines_text.text = (SocketManager.initialData.Bets[BetCounter]).ToString("f3");
     }
 
 
@@ -336,8 +336,8 @@ public class SlotBehaviour : MonoBehaviour
     internal void SetInitialUI()
     {
         BetCounter = 0;
-        if (TotalBet_text) TotalBet_text.text = SocketManager.initialData.Bets[BetCounter].ToString();
-        if (Lines_text) Lines_text.text = (SocketManager.initialData.Bets[BetCounter] * Lines).ToString();
+        if (TotalBet_text) TotalBet_text.text = (SocketManager.initialData.Bets[BetCounter] * Lines).ToString("f3");
+        if (Lines_text) Lines_text.text = (SocketManager.initialData.Bets[BetCounter]).ToString("f3");
         if (TotalWin_text) TotalWin_text.text = SocketManager.playerdata.haveWon.ToString();
         if (Balance_text) Balance_text.text = (SocketManager.playerdata.Balance).ToString();
         uiManager.InitialiseUIData(SocketManager.initUIData.AbtLogo.link, SocketManager.initUIData.AbtLogo.logoSprite, SocketManager.initUIData.ToULink, SocketManager.initUIData.PopLink, SocketManager.initUIData.paylines, SocketManager.initUIData.spclSymbolTxt);
@@ -481,6 +481,8 @@ public class SlotBehaviour : MonoBehaviour
     {
         IsSpinning = true;
         ToggleButtonGrp(false);
+        TotalWin_text.text = 0.ToString();
+
         if (IsFreeSpin)
         {
 
@@ -504,18 +506,11 @@ public class SlotBehaviour : MonoBehaviour
             Debug.Log("Error while conversion " + e.Message);
         }
 
-        try
-        {
-            if (Balance_text) balance = double.Parse(Balance_text.text);
-        }
-        catch (Exception e)
-        {
-            Debug.Log("Error while conversion " + e.Message);
-        }
+        balance = SocketManager.playerdata.Balance;
 
         balance = balance - bet;
 
-        if (Balance_text) Balance_text.text = balance.ToString();
+        if (Balance_text) Balance_text.text = balance.ToString("f3");
 
         SocketManager.AccumulateResult(BetCounter);
         yield return new WaitUntil(() => SocketManager.isResultdone);
@@ -570,12 +565,12 @@ public class SlotBehaviour : MonoBehaviour
         }
         else
         {
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(1f);
             IsSpinning = false;
         }
 
-        if (TotalWin_text) TotalWin_text.text = SocketManager.playerdata.haveWon.ToString();
-        if (Balance_text) Balance_text.text = ((double)SocketManager.playerdata.Balance).ToString();
+        if (TotalWin_text) TotalWin_text.text = SocketManager.playerdata.haveWon.ToString("f3");
+        if (Balance_text) Balance_text.text = ((double)SocketManager.playerdata.Balance).ToString("f3");
 
         if (SocketManager.resultData.freeSpins.isNewAdded && !IsFreeSpin)
         {

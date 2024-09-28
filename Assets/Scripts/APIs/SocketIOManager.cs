@@ -29,14 +29,14 @@ public class SocketIOManager : MonoBehaviour
     private SocketManager manager;
 
     //HACK: Socket URI
-    //protected string TestSocketURI = "https://game-crm-rtp-backend.onrender.com/";
-    protected string TestSocketURI = "https://6f01c04j-5000.inc1.devtunnels.ms/"; // Gaurav Port
+    protected string TestSocketURI = "https://game-crm-rtp-backend.onrender.com/";
+    //protected string TestSocketURI = "https://6f01c04j-5000.inc1.devtunnels.ms/"; // Gaurav Port
     //protected string TestSocketURI = "https://7p68wzhv-5000.inc1.devtunnels.ms/"; // Rahul Port
     protected string SocketURI = null;
 
     [SerializeField]
     private string TestToken;
-    protected string gameID = "SL-FC";
+    protected string gameID = "SL-FC";//SL-FC
 
     internal bool isLoaded = false;
     internal bool SetInit = false;
@@ -517,7 +517,7 @@ public class Payout
 public class PlayerData
 {
     public double Balance { get; set; }
-    public object haveWon { get; set; }
+    public double haveWon { get; set; }
     public double currentWining { get; set; }
     public object totalbet { get; set; }
 }
@@ -559,7 +559,7 @@ public class Symbol
     public object symbolsCount { get; set; }
     public object increaseValue { get; set; }
     public object description { get; set; }
-    public Payout payout { get; set; }
+    public int payout { get; set; }
     public MixedPayout mixedPayout { get; set; }
     public DefaultPayout defaultPayout { get; set; }
 }
