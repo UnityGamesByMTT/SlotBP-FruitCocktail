@@ -338,7 +338,7 @@ public class SlotBehaviour : MonoBehaviour
         BetCounter = 0;
         if (TotalBet_text) TotalBet_text.text = (SocketManager.initialData.Bets[BetCounter] * Lines).ToString("f3");
         if (Lines_text) Lines_text.text = (SocketManager.initialData.Bets[BetCounter]).ToString();
-        if (TotalWin_text) TotalWin_text.text = SocketManager.playerdata.haveWon.ToString();
+        if (TotalWin_text) TotalWin_text.text = 0.ToString("f3");
         if (Balance_text) Balance_text.text = (SocketManager.playerdata.Balance).ToString();
         uiManager.InitialiseUIData(SocketManager.initUIData.AbtLogo.link, SocketManager.initUIData.AbtLogo.logoSprite, SocketManager.initUIData.ToULink, SocketManager.initUIData.PopLink, SocketManager.initUIData.paylines, SocketManager.initUIData.spclSymbolTxt);
         //bonusManager.PopulateBonusPaytable(SocketManager.bonusdata);
@@ -481,7 +481,6 @@ public class SlotBehaviour : MonoBehaviour
     {
         IsSpinning = true;
         ToggleButtonGrp(false);
-        TotalWin_text.text = 0.ToString();
 
         if (IsFreeSpin)
         {
@@ -543,6 +542,8 @@ public class SlotBehaviour : MonoBehaviour
         //TODO: To Be Uncommented When Move To Publishing
         CheckPayoutLineBackend(SocketManager.resultData.linesToEmit, SocketManager.resultData.FinalsymbolsToEmit, SocketManager.resultData.jackpot);
         KillAllTweens();
+        if (TotalWin_text) TotalWin_text.text = SocketManager.playerdata.currentWining.ToString("f3");
+        if (Balance_text) Balance_text.text = ((double)SocketManager.playerdata.Balance).ToString("f3");
 
 
         CheckPopups = true;
@@ -553,7 +554,7 @@ public class SlotBehaviour : MonoBehaviour
         }
         else
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.8f);
             CheckBonusGame();
         }
 
@@ -565,12 +566,10 @@ public class SlotBehaviour : MonoBehaviour
         }
         else
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.8f);
             IsSpinning = false;
         }
 
-        if (TotalWin_text) TotalWin_text.text = SocketManager.playerdata.haveWon.ToString("f3");
-        if (Balance_text) Balance_text.text = ((double)SocketManager.playerdata.Balance).ToString("f3");
 
         if (SocketManager.resultData.freeSpins.isNewAdded && !IsFreeSpin)
         {
