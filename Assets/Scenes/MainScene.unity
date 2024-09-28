@@ -25735,8 +25735,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 895726569}
-  - {fileID: 1574897783}
   - {fileID: 21776335}
+  - {fileID: 1574897783}
   - {fileID: 1741415082}
   - {fileID: 863650448}
   - {fileID: 1480051154}
@@ -37148,6 +37148,11 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 4f5a5e7b0e0414921bdc599ff5c8108f, type: 3}
   - {fileID: 21300000, guid: 98afa644e517042c5bb3e0d8a9245bb5, type: 3}
   - {fileID: 21300000, guid: c780dc7cc2f2e48e48a7effdeb76f813, type: 3}
+  Wild_Sprite:
+  - {fileID: 21300000, guid: ef0862a6308024f7d836f23033997ba7, type: 3}
+  - {fileID: 21300000, guid: ef0862a6308024f7d836f23033997ba7, type: 3}
+  - {fileID: 21300000, guid: ef0862a6308024f7d836f23033997ba7, type: 3}
+  - {fileID: 21300000, guid: ef0862a6308024f7d836f23033997ba7, type: 3}
   Balance_text: {fileID: 217362397}
   TotalBet_text: {fileID: 95709928}
   Lines_text: {fileID: 69738317}

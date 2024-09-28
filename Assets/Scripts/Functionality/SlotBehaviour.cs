@@ -79,6 +79,8 @@ public class SlotBehaviour : MonoBehaviour
     internal Sprite[] Strawberry_Sprite;
     [SerializeField]
     internal Sprite[] Watermelon_Sprite;
+    [SerializeField]
+    internal Sprite[] Wild_Sprite;
 
 
     [Header("Miscellaneous UI")]
@@ -421,9 +423,9 @@ public class SlotBehaviour : MonoBehaviour
                 animScript.AnimationSpeed = 12f;
                 break;
             case 8:
-                for (int i = 0; i < Strawberry_Sprite.Length; i++)
+                for (int i = 0; i < Wild_Sprite.Length; i++)
                 {
-                    animScript.textureArray.Add(Strawberry_Sprite[i]);
+                    animScript.textureArray.Add(Wild_Sprite[i]);
                 }
                 animScript.AnimationSpeed = 12f;
                 break;
