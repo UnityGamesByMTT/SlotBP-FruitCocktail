@@ -829,6 +829,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &39258527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1242,6 +1246,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &47121447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3489,6 +3497,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &181951018
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5144,6 +5156,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &283166545
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5949,6 +5965,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 20
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!1 &337794386
 GameObject:
   m_ObjectHideFlags: 0
@@ -6517,6 +6537,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 50
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &357968532
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11696,6 +11720,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &712275989
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13239,6 +13267,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &779084402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15254,6 +15286,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &888786054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17242,6 +17278,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &1007380338
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17372,7 +17412,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1023456359
 RectTransform:
   m_ObjectHideFlags: 0
@@ -17533,6 +17573,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &1037225470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18280,6 +18324,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 20
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!1 &1076172364
 GameObject:
   m_ObjectHideFlags: 0
@@ -22439,6 +22487,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &1301867092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23144,6 +23196,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &1343796305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23844,6 +23900,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &1382300847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26614,6 +26674,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 20
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!1 &1537102423
 GameObject:
   m_ObjectHideFlags: 0
@@ -30550,6 +30614,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 100
   delayBetweenLoop: 0
+  StartOnAwake: 1
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!1 &1709169493
 GameObject:
   m_ObjectHideFlags: 0
@@ -33136,6 +33204,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &1850520104
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34738,6 +34810,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &1939844132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36353,6 +36429,10 @@ MonoBehaviour:
   currentAnimationState: 0
   AnimationSpeed: 10
   delayBetweenLoop: 0
+  StartOnAwake: 0
+  DestroyOnCompletion: 0
+  isplaying: 0
+  OriginalSprite: {fileID: 0}
 --- !u!114 &2024903588
 MonoBehaviour:
   m_ObjectHideFlags: 0
