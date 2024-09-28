@@ -10,17 +10,11 @@ using System;
 
 public class BonusGame : MonoBehaviour
 {
-
-    [SerializeField]
-    private RectTransform mainContainer_RT;
-
     [Header("Sprites")]
     [SerializeField]
     private Sprite[] myImages;
 
     [Header("Slot Images")]
-    [SerializeField]
-    private List<SlotImage> images;
     [SerializeField]
     private List<SlotImage> Tempimages;
 
@@ -34,7 +28,6 @@ public class BonusGame : MonoBehaviour
     [Header("Slots Transforms")]
     [SerializeField]
     private Transform[] Slot_Transform;
-
 
     int tweenHeight = 0;  //calculate the height at which tweening is done
 
@@ -62,136 +55,182 @@ public class BonusGame : MonoBehaviour
     private SocketIOManager SocketManager;
     [SerializeField] private SlotBehaviour slotBehaviour;
 
-    [SerializeField] private List<int> InitalizeList = new List<int>();
-
     [SerializeField] private int stopIndex;
     [SerializeField] private Sprite exitSprite;
     [SerializeField] private GameObject bonusGame;
     [SerializeField] private List<Transform> OuterReelSlots;
     [SerializeField] private GameObject OuterSlotItemPrefab;
-    [SerializeField] private List<int> verticalList;
-    [SerializeField] private List<int> horizontalList;
 
-    [SerializeField] private List<OuterReelItem> OuterReeAllItem;
+    [SerializeField] private List<OuterReelItem> Outer_Reel_All_Item;
     [SerializeField] private GameObject lighting;
 
-    [SerializeField] private TMP_Text currentBet;
-    [SerializeField] private TMP_Text creditAmount;
-    [SerializeField] private TMP_Text multiplier;
+    [SerializeField] private GameManager m_GameManager;
+
+    [Header("Data Update Section")]
+    [SerializeField] private TMP_Text m_Lives;
+    [SerializeField] private TMP_Text m_Amount;
+    [SerializeField] private TMP_Text m_TotalWonAmount;
+
     [SerializeField] private List<int> animIndex = new List<int>();
+    [SerializeField] private int m_SpaceFactor;
+
+    [Header("Outer Reel References Section")]
+    [SerializeField] private List<OuterReelItem> m_FruitCockTail;
+    [SerializeField] private List<OuterReelItem> m_WaterMelon;
+    [SerializeField] private List<OuterReelItem> m_Peer;
+    [SerializeField] private List<OuterReelItem> m_Coconut;
+    [SerializeField] private List<OuterReelItem> m_Pineapple;
+    [SerializeField] private List<OuterReelItem> m_Orange;
+    [SerializeField] private List<OuterReelItem> m_Cherry;
+    [SerializeField] private List<OuterReelItem> m_Exit;
+
+    [SerializeField] private GameObject m_StopGameobject;
+    [SerializeField] private GameObject m_BonusWonPopup;
+
+    BonusResult m_DefaultStructure;
+    BonusResult m_ReceivedStructure;
+
     private bool ison = true;
     public List<int> resultnum = new List<int>();
-    private int resultmult = 0;
-    private double bet = 0;
+    private int Lives = 0;
+    private int N_SpinCount_Begin = 0;
+    private int N_SpinCount = 0;
+    private Coroutine m_Spinning;
+    private Coroutine tweenroutine;
+    private bool IsSpinning;
 
     private void Start()
     {
-
-        //PopulateOuterReel();
         InvokeRepeating("ToggleOnOff", 0.1f, 0.2f);
+        tweenHeight = (myImages.Length * IconSizeFactor) - 280;
+
+        m_DefaultStructure = new BonusResult
+        {
+            innerMatrix = new List<List<int>> { new List<int> { 5, 5, 6 }, new List<int> { 6, 6, 3 }, new List<int> { 2, 3, 4 } },
+            outerRingSymbol = new List<int> { 5, 3, 7 },
+            totalWinAmount = 2.5,
+            winings = new List<string> { "1.0", "1.0", "0" }
+        };
     }
-
-
-    internal void startGame(List<int> result, double currentBet)
-    {
-
-        List<int> allItem = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-        bet = currentBet;
-       
-        for (int i = 0; i < 3; i++)
-        {
-            resultnum.Add(result[i]);
-        }
-
-        stopIndex = result[3];
-
-        for (int i = 0; i < 3; i++)
-        {
-            resultmult += (result[result.Count - 1 - i]);
-        }
-
-        for (int i = 0; i < resultnum.Count; i++)
-        {
-            if (resultnum[i] == stopIndex)
-                animIndex.Add(i);
-        }
-        //Shuffle(InitalizeList);
-        PopulateOuterReel();
-        PopulateInitalSlots(0, InitalizeList);
-        PopulateInitalSlots(1, InitalizeList);
-        PopulateInitalSlots(2, InitalizeList);
-        bonusGame.SetActive(true);
-        StartSlots();
-
-    }
-
 
     //just for testing purposes delete on production
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            StartSlots();
-            MoveSelector();
-
-        }
-    }
-    //populate the slots with the values recieved from backend
-    internal void PopulateInitalSlots(int number, List<int> myvalues)
-    {
-        PopulateSlot(myvalues, number);
-    }
-
-    //reset the layout after populating the slots
-    //internal void LayoutReset(int number)
+    //private void Update()
     //{
-    //    if (Slot_Elements[number]) Slot_Elements[number].ignoreLayout = true;
-    //    //if (SlotStart_Button) SlotStart_Button.interactable = true;
+    //    if (Input.GetKeyDown(KeyCode.B))
+    //    {
+    //        StartBonus(m_DefaultStructure.winings.Count, m_DefaultStructure);
+    //        StartBonusGame();
+    //    }
     //}
 
-    private void PopulateSlot(List<int> values, int number)
+    internal void StartBonusGame()
     {
-        Shuffle(values);
-        if (Slot_Objects[number]) Slot_Objects[number].SetActive(true);
-        for (int i = 0; i < values.Count; i++)
+        m_GameManager.m_AudioController.m_BG_Audio.Stop();
+        m_GameManager.m_AudioController.m_Bonus_BG_Audio.Play();
+        bonusGame.SetActive(true);
+        if (!IsSpinning)
         {
-            GameObject myImg = Instantiate(Image_Prefab, Slot_Transform[number]);
-            images[number].slotImages.Add(myImg.GetComponent<Image>());
-            images[number].slotImages[i].sprite = myImages[values[i]];
+            IsSpinning = true;
+
+            if (m_Spinning != null)
+            {
+                StopCoroutine(m_Spinning);
+                m_Spinning = null;
+            }
+            m_Spinning = StartCoroutine(AutoSpinCoroutine());
         }
-        int max_child = Slot_Objects[number].transform.childCount;
-
-
-        Slot_Objects[number].transform.GetChild(max_child - resultnum[number] - 1).GetComponent<Image>().sprite = myImages[resultnum[number]];
-        if (mainContainer_RT) LayoutRebuilder.ForceRebuildLayoutImmediate(mainContainer_RT);
-        tweenHeight = (values.Count * IconSizeFactor) - 280;
     }
 
+    internal void StartBonus(int m_count, BonusResult m_BonusData)
+    {
+        m_ReceivedStructure = m_BonusData;
+        N_SpinCount = m_count;
+        m_StopGameobject = null;
+        N_SpinCount_Begin = 0;
+        Lives = m_ReceivedStructure.outerRingSymbol.Count(x => x == 7);
+        m_TotalWonAmount.text = m_ReceivedStructure.totalWinAmount.ToString();
+    }
 
     //starts the spin process
     private void StartSlots(bool autoSpin = false)
     {
-
-
         if (TempList.Count > 0)
         {
             StopGameAnimation();
         }
+
         PayCalculator.ResetLines();
-        StartCoroutine(TweenRoutine());
-        for (int i = 0; i < Tempimages.Count; i++)
+
+        tweenroutine = StartCoroutine(TweenRoutine());
+    }
+
+    private void StopAutoSpin()
+    {
+        //if (audioController) audioController.PlaySpinButtonAudio();
+
+        if (IsSpinning)
         {
-            Tempimages[i].slotImages.Clear();
-            Tempimages[i].slotImages.TrimExcess();
+            IsSpinning = false;
+            StartCoroutine(StopAutoSpinCoroutine());
+        }
+    }
+
+    private IEnumerator AutoSpinCoroutine()
+    {
+        yield return new WaitForSeconds(0.4f);
+
+        for(int i = 0; i < N_SpinCount; i ++)
+        {
+            StartSlots(IsSpinning);
+            yield return tweenroutine;
+        }
+
+        yield return new WaitForSeconds(0.2f);
+
+        bonusGame.SetActive(false);
+        m_GameManager.m_AudioController.m_Bonus_Audio.Play();
+        m_GameManager.m_PushObject(m_BonusWonPopup);
+
+        yield return new WaitForSeconds(3f);
+
+        StopAutoSpin();
+        Reset();
+        slotBehaviour.ToggleButtonGrp(true);
+    }
+
+    private IEnumerator StopAutoSpinCoroutine()
+    {
+        yield return new WaitUntil(() => !IsSpinning);
+        if (m_Spinning != null || tweenroutine != null)
+        {
+            try
+            {
+                StopCoroutine(m_Spinning);
+                StopCoroutine(tweenroutine);
+                tweenroutine = null;
+                m_Spinning = null;
+                StopCoroutine(StopAutoSpinCoroutine());
+            }
+            catch (Exception e)
+            {
+                Debug.Log("Error Occured..." + string.Concat("<color=red><b>", e, "</b></color>"));
+            }
         }
     }
 
     //manage the Routine for spinning of the slots
     private IEnumerator TweenRoutine()
     {
-        currentBet.text = bet.ToString();
-        yield return new WaitForSeconds(0.5f);
-        Coroutine moveSelector = StartCoroutine(ToggleSelectorAnimation(0.05f, 2));
+        IsSpinning = true;
+        StopInnerAnimations();
+        m_Lives.text = Lives.ToString();
+
+        m_GameManager.m_AudioController.m_Spin_Audio.Play();
+
+        Coroutine moveSelector = StartCoroutine(ToggleSelectorAnimation(0.08f, 2));
+
+        yield return new WaitForSeconds(0.1f);
+
         for (int i = 0; i < numberOfSlots; i++)
         {
             InitializeTweening(Slot_Transform[i]);
@@ -199,23 +238,33 @@ public class BonusGame : MonoBehaviour
         }
 
         yield return new WaitForSeconds(0.5f);
+
+        m_StopGameobject = PopulateOuterMatrix(m_ReceivedStructure.outerRingSymbol[N_SpinCount_Begin]);
+
+        PopulateInnerMatrix();
+
         for (int i = 0; i < numberOfSlots; i++)
         {
-            yield return StopTweening(resultnum[i] + 1, Slot_Transform[i], i);
+            yield return StopTweening(5, Slot_Transform[i], i);
         }
 
         yield return moveSelector;
+
+        m_GameManager.m_AudioController.m_Spin_Audio.Stop();
+
+        m_Lives.text = Lives.ToString();
+
+        if(m_ReceivedStructure.outerRingSymbol[N_SpinCount_Begin - 1] != 7)
+        {
+            PlayInnerAnimations();
+        }
+
         CheckPayoutLineBackend(resultnum);
 
-        creditAmount.text = (resultmult * bet).ToString();
-        multiplier.text = "x " + resultmult.ToString();
+        m_Amount.text = (m_ReceivedStructure.winings[N_SpinCount_Begin - 1]).ToString();
 
         yield return new WaitForSeconds(3f);
         KillAllTweens();
-        Reset();
-
-
-
     }
 
 
@@ -224,7 +273,6 @@ public class BonusGame : MonoBehaviour
 
         for (int i = 0; i < animIndex.Count; i++)
         {
-            Tempimages[animIndex[i]].slotImages.Add(images[animIndex[i]].slotImages[(images[animIndex[i]].slotImages.Count - (numbers[animIndex[i]] + 1))]);
             StartGameAnimation(Tempimages[animIndex[i]].slotImages[0].gameObject);
         }
 
@@ -245,124 +293,6 @@ public class BonusGame : MonoBehaviour
         }
     }
 
-
-    void PopulateOuterReel()
-    {
-        GameObject slotItem;
-        OuterReelItem temp;
-
-        for (int i = 0; i < OuterReelSlots.Count; i++)
-        {
-
-            if (i % 2 == 0)
-            {
-                setVerticalist();
-                verticalList.RemoveAll(item => item == -1);
-                Shuffle(verticalList);
-                verticalList.Insert(0, -1);
-                verticalList.Add(-1);
-                for (int j = 0; j < verticalList.Count; j++)
-                {
-                    slotItem = Instantiate(OuterSlotItemPrefab, OuterReelSlots[i]);
-                    temp = slotItem.GetComponent<OuterReelItem>();
-                    if (verticalList[j] == -1)
-                    {
-                        temp.image.sprite = exitSprite;
-                        temp.id = -1;
-
-                    }
-                    else
-                    {
-                        temp.image.sprite = myImages[verticalList[j]];
-                        temp.id = verticalList[j];
-                    }
-                    if (i == 2) slotItem.transform.SetAsFirstSibling();
-                    OuterReeAllItem.Add(temp);
-                }
-
-            }
-            else
-            {
-                setHorizontalist();
-                Shuffle(horizontalList);
-                for (int k = 0; k < horizontalList.Count; k++)
-                {
-                    slotItem = Instantiate(OuterSlotItemPrefab, OuterReelSlots[i]);
-                    temp = slotItem.GetComponent<OuterReelItem>();
-
-                    temp.image.sprite = myImages[horizontalList[k]];
-                    temp.id = horizontalList[k];
-                    if (i == 3) slotItem.transform.SetAsFirstSibling();
-                    OuterReeAllItem.Add(temp);
-
-                }
-            }
-        }
-
-        setOuterReel();
-
-
-    }
-
-    void setVerticalist()
-    {
-        verticalList.Clear();
-        List<int> tempList = new List<int>();
-        for (int i = 0; i < myImages.Length; i++)
-        {
-            tempList.Add(i);
-        }
-            verticalList.Clear();
-        for (int i = 0; i < 5; i++)
-        {
-            int index = UnityEngine.Random.Range(0, tempList.Count);
-            verticalList.Add(tempList[index]);
-            tempList.Remove(tempList[index]);
-
-        }
-        tempList.Clear();
-
-    }
-
-    void setHorizontalist()
-    {
-        horizontalList.Clear();
-        List<int> tempList = new List<int>();
-        for (int i = 0; i < myImages.Length; i++)
-        {
-            tempList.Add(i);
-        }
-            horizontalList.Clear();
-        for (int i = 0; i < 6; i++)
-        {
-            int index = UnityEngine.Random.Range(0, tempList.Count);
-            horizontalList.Add(tempList[index]);
-            tempList.Remove(tempList[index]);
-
-        }
-        tempList.Clear();
-
-
-    }
-
-    void setOuterReel()
-    {
-
-        //0,6,13,19
-        List<int> outerReelIndex = new List<int>();
-        for (int i = 0; i < OuterReeAllItem.Count; i++)
-        {
-            if (OuterReeAllItem[i].id != -1)
-                outerReelIndex.Add(i);
-        }
-
-        int rndIndex = outerReelIndex[UnityEngine.Random.Range(0, outerReelIndex.Count)];
-        print("randomindex " + rndIndex);
-        OuterReeAllItem[rndIndex].image.sprite = myImages[stopIndex];
-        OuterReeAllItem[rndIndex].id = stopIndex;
-
-    }
-
     void ToggleOnOff()
     {
         ison = !ison;
@@ -373,52 +303,136 @@ public class BonusGame : MonoBehaviour
     private void Reset()
     {
         StopGameAnimation();
-
-        foreach (Transform item in OuterReelSlots)
-        {
-            for (int i = item.childCount - 1; i >= 0; i--)
-            {
-                Destroy(item.GetChild(i).gameObject);
-            }
-        }
-
-        resultnum.Clear();
-        animIndex.Clear();
-        OuterReeAllItem.Clear();
-        foreach (var item in images)
-        {
-            item.slotImages.Clear();
-        }
-        foreach (OuterReelItem item in OuterReeAllItem)
-        {
-            item.selector.SetActive(false);
-
-        }
-
-        bonusGame.SetActive(false);
+        ResetHighlights();
+        m_GameManager.m_PopObject();
+        m_GameManager.m_AudioController.m_Bonus_BG_Audio.Stop();
+        m_GameManager.m_AudioController.m_BG_Audio.Play();
     }
 
+    private void ResetHighlights()
+    {
+        foreach (OuterReelItem item in Outer_Reel_All_Item)
+        {
+            item.selector.SetActive(false);
+        }
+    }
 
-    #region TweeningCode
+    private void PopulateInnerMatrix()
+    {
+        for(int i = 0; i < Tempimages.Count; i++)
+        {
+            Tempimages[i].slotImages[0].transform.GetChild(0).GetComponent<Image>().sprite = myImages[m_ReceivedStructure.innerMatrix[N_SpinCount_Begin][i]];
+            Tempimages[i].slotImages[0].GetComponent<OuterReelItem>().image.GetComponent<ImageAnimation>().textureArray = GetSpriteList(m_ReceivedStructure.innerMatrix[N_SpinCount_Begin][i]).ToList();
+        }
+        if(N_SpinCount_Begin < N_SpinCount)
+        {
+            N_SpinCount_Begin++;
+        }
+    }
+
+    private Sprite[] GetSpriteList(int m_value)
+    {
+        switch (m_value)
+        {
+            case 0://FRUITCOCKTAIL
+                return slotBehaviour.Juice_Sprite;
+            case 1://WATERMELON
+                return slotBehaviour.Watermelon_Sprite;
+            case 2://PEER
+                return slotBehaviour.Pear_Sprite;
+            case 3://COCONUT
+                return slotBehaviour.Coconut_Sprite;
+            case 4://PINEAPPLE
+                return slotBehaviour.Pineapple_Sprite;
+            case 5://ORANGE
+                return slotBehaviour.Orange_Sprite;
+            case 6://CHERRY
+                return slotBehaviour.Cherry_Sprite;
+            case 7://EXIT
+                break;
+        }
+        return null;
+    }
+
+    private void PlayInnerAnimations()
+    {
+        for(int i = 0; i < Tempimages.Count; i++)
+        {
+            Tempimages[i].slotImages[0].GetComponent<OuterReelItem>().image.GetComponent<ImageAnimation>().StartAnimation();
+        }
+    }
+
+    private void StopInnerAnimations()
+    {
+        for (int i = 0; i < Tempimages.Count; i++)
+        {
+            Tempimages[i].slotImages[0].GetComponent<OuterReelItem>().image.GetComponent<ImageAnimation>().StopAnimation();
+            Tempimages[i].slotImages[0].GetComponent<OuterReelItem>().image.GetComponent<ImageAnimation>().textureArray.Clear();
+            Tempimages[i].slotImages[0].GetComponent<OuterReelItem>().image.GetComponent<ImageAnimation>().textureArray.TrimExcess();
+        }
+    }
+
+    private GameObject PopulateOuterMatrix(int m_value)
+    {
+        int random_index;
+        switch (m_value)
+        {
+            case 0://FRUITCOCKTAIL
+                random_index = UnityEngine.Random.Range(0, m_FruitCockTail.Count);
+                return m_FruitCockTail[random_index].gameObject;
+            case 1://WATERMELON
+                random_index = UnityEngine.Random.Range(0, m_WaterMelon.Count);
+                return m_WaterMelon[random_index].gameObject;
+            case 2://PEER
+                random_index = UnityEngine.Random.Range(0, m_Peer.Count);
+                return m_Peer[random_index].gameObject;
+            case 3://COCONUT
+                random_index = UnityEngine.Random.Range(0, m_Coconut.Count);
+                return m_Coconut[random_index].gameObject;
+            case 4://PINEAPPLE
+                random_index = UnityEngine.Random.Range(0, m_Pineapple.Count);
+                return m_Pineapple[random_index].gameObject;
+            case 5://ORANGE
+                random_index = UnityEngine.Random.Range(0, m_Orange.Count);
+                return m_Orange[random_index].gameObject;
+            case 6://CHERRY
+                random_index = UnityEngine.Random.Range(0, m_Cherry.Count);
+                return m_Cherry[random_index].gameObject;
+            case 7://EXIT
+                random_index = UnityEngine.Random.Range(0, m_Exit.Count);
+                Lives--;
+                return m_Exit[random_index].gameObject;
+        }
+
+        return null;
+    }
+
+    #region [[===TWEENING CODE===]]
+
     private void InitializeTweening(Transform slotTransform)
     {
         slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
-        Tweener tweener = slotTransform.DOLocalMoveY(-tweenHeight, 0.2f).SetLoops(-1, LoopType.Restart).SetDelay(0);
+        Tweener tweener = slotTransform.DOLocalMoveY(-tweenHeight, 1.2f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0);
         tweener.Play();
         alltweens.Add(tweener);
     }
 
-
-
     private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index)
     {
-        alltweens[index].Pause();
-        int tweenpos = (reqpos * (IconSizeFactor + 40)) - (IconSizeFactor + (2 * 40));
-        alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos - 100 - 40, 0.5f).SetEase(Ease.OutElastic);
-        yield return new WaitForSeconds(0.2f);
+        bool IsRegister = false;
+        yield return alltweens[index].OnStepComplete(delegate { IsRegister = true; });
+        yield return new WaitUntil(() => IsRegister);
+        alltweens[index].Kill();
+        //alltweens[index].Pause();
+        int tweenpos = (reqpos * (IconSizeFactor + m_SpaceFactor)) - (IconSizeFactor + (2 * m_SpaceFactor)) + 20;
+        //alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos - 100 - 40, 0.5f).SetEase(Ease.OutElastic);
+        alltweens[index] = slotTransform.DOLocalMoveY((-tweenpos + (100)) + (m_SpaceFactor > 0 ? m_SpaceFactor / 4 : 0), 1.1f).SetEase(Ease.OutQuad);
+        //yield return new WaitForSeconds(0.2f);
+        yield return alltweens[index].WaitForCompletion();
+        alltweens[index].Kill();
     }
 
-
+    //HACK: Killing all initialized tweens to stop tweens.
     private void KillAllTweens()
     {
         for (int i = 0; i < alltweens.Count; i++)
@@ -429,45 +443,44 @@ public class BonusGame : MonoBehaviour
 
     }
 
-
-    void MoveSelector()
-    {
-        StartCoroutine(ToggleSelectorAnimation(0.05f, 2));
-    }
-
+    //HACK: This coroutine is used to run the border of the boxes one after another.
     IEnumerator ToggleSelectorAnimation(float delay, int noOfRotation = 1)
     {
+        int count = 0;
+        ResetHighlights();
         for (int j = 0; j < noOfRotation + 1; j++)
         {
-            foreach (OuterReelItem item in OuterReeAllItem)
+            for(int i = Outer_Reel_All_Item.Count - 1; i > 0; i--)
             {
-                item.selector.SetActive(true);
-                if (j == noOfRotation && item.id == stopIndex)
+                Outer_Reel_All_Item[i].selector.SetActive(true);
+                if (j == noOfRotation && Outer_Reel_All_Item[i].gameObject == m_StopGameobject)
                 {
-
+                    Outer_Reel_All_Item[i].selector.SetActive(true);
                     slotBehaviour.CheckPopups = false;
+                    yield return new WaitForSeconds(0.2f);
                     yield break;
                 }
-                yield return new WaitForSeconds(delay);
-                item.selector.SetActive(false);
-
+                if (j < noOfRotation)
+                {
+                    yield return new WaitForSeconds(delay);
+                }
+                else
+                {
+                    count = 0;
+                    if(count < 4)
+                    {
+                        count++;
+                        yield return new WaitForSeconds(delay * 2f);
+                    }
+                    else
+                    {
+                        yield return new WaitForSeconds(delay * 4f);
+                    }
+                }
+                Outer_Reel_All_Item[i].selector.SetActive(false);
             }
         }
-
-    }
-
-    void Shuffle(List<int> ts)
-    {
-        int count = ts.Count;
-        int last = count - 1;
-        for (int i = 0; i < last; ++i)
-        {
-            int r = UnityEngine.Random.Range(i, count);
-            int tmp = ts[i];
-            ts[i] = ts[r];
-            ts[r] = tmp;
-        }
+        yield return new WaitForSeconds(0.6f);
     }
     #endregion
 }
-
