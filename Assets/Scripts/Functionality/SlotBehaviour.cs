@@ -320,7 +320,7 @@ public class SlotBehaviour : MonoBehaviour
         }
 
         if (TotalBet_text) TotalBet_text.text = (SocketManager.initialData.Bets[BetCounter] * Lines).ToString("f3");
-        if (Lines_text) Lines_text.text = (SocketManager.initialData.Bets[BetCounter]).ToString("f3");
+        if (Lines_text) Lines_text.text = (SocketManager.initialData.Bets[BetCounter]).ToString();
     }
 
 
@@ -337,7 +337,7 @@ public class SlotBehaviour : MonoBehaviour
     {
         BetCounter = 0;
         if (TotalBet_text) TotalBet_text.text = (SocketManager.initialData.Bets[BetCounter] * Lines).ToString("f3");
-        if (Lines_text) Lines_text.text = (SocketManager.initialData.Bets[BetCounter]).ToString("f3");
+        if (Lines_text) Lines_text.text = (SocketManager.initialData.Bets[BetCounter]).ToString();
         if (TotalWin_text) TotalWin_text.text = SocketManager.playerdata.haveWon.ToString();
         if (Balance_text) Balance_text.text = (SocketManager.playerdata.Balance).ToString();
         uiManager.InitialiseUIData(SocketManager.initUIData.AbtLogo.link, SocketManager.initUIData.AbtLogo.logoSprite, SocketManager.initUIData.ToULink, SocketManager.initUIData.PopLink, SocketManager.initUIData.paylines, SocketManager.initUIData.spclSymbolTxt);
