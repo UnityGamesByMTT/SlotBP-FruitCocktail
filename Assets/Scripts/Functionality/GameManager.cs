@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour
     private void OnClickDetection()
     {
         if (m_Paytable_Button) m_Paytable_Button.onClick.RemoveAllListeners();
-        if (m_Paytable_Button) m_Paytable_Button.onClick.AddListener(() => { m_PushObject(m_Paytable_Object); m_AudioController.m_Click_Audio.Play(); });
+        if (m_Paytable_Button) m_Paytable_Button.onClick.AddListener(() => { m_PushObject(m_Paytable_Object); m_AudioController.m_Click_Audio.Play(); m_UIManager.CurrentIndex = 0; m_UIManager.ActivatePaytable(0); });
 
         if (m_Rules_Button) m_Rules_Button.onClick.RemoveAllListeners();
         if (m_Rules_Button) m_Rules_Button.onClick.AddListener(() => { m_PushObject(m_Rules_Object); m_AudioController.m_Click_Audio.Play(); });
