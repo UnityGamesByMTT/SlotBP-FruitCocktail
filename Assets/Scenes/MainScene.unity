@@ -8023,6 +8023,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slotManager: {fileID: 2046803210}
   bonusdata: []
+  uiManager: {fileID: 377874625}
   TestToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZDgzZDdkYTI3YmY5MDI0NDNlYjRkZSIsInVzZXJuYW1lIjoiZGFyc2hhbiIsInJvbGUiOiJwbGF5ZXIiLCJpYXQiOjE3MjczMjU2MjAsImV4cCI6MTcyNzkzMDQyMH0.M1zWnltlRY1Rh1LqsC2Dz9ns7y9kmnBaP39-sDghHMI
 --- !u!1 &519420028
 GameObject:

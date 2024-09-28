@@ -27,7 +27,7 @@ public class SocketIOManager : MonoBehaviour
     //WebSocket currentSocket = null;
     internal bool isResultdone = false;
     private SocketManager manager;
-
+    [SerializeField] internal UIManager uiManager;
     //HACK: Socket URI
     protected string TestSocketURI = "https://game-crm-rtp-backend.onrender.com/";
     //protected string TestSocketURI = "https://6f01c04j-5000.inc1.devtunnels.ms/"; // Gaurav Port
@@ -168,6 +168,15 @@ public class SocketIOManager : MonoBehaviour
     private void OnDisconnected(string response)
     {
         Debug.Log("Disconnected from the server");
+        //if (maxReconnectionAttempts <= this.manager.ReconnectAttempts)
+        //{
+        StopAllCoroutines();
+        uiManager.DisconnectionPopup(false);
+        //}
+        //else
+        //{
+        //    uiManager.DisconnectionPopup(false);
+        //}
     }
 
     private void OnError(string response)
