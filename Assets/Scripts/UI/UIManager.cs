@@ -68,6 +68,12 @@ public class UIManager : MonoBehaviour
     private bool isMusic = true;
     private bool isSound = true;
 
+    [Header("Disconnection Popup")]
+    [SerializeField]
+    private Button CloseDisconnect_Button;
+    [SerializeField]
+    private GameObject DisconnectPopup_Object;
+
     [SerializeField] private AudioController audioController;
     [SerializeField] private SlotBehaviour slotManager;
     private int FreeSpins;
@@ -93,6 +99,9 @@ public class UIManager : MonoBehaviour
 
         if (m_CloseMenu) m_CloseMenu.onClick.RemoveAllListeners();
         if (m_CloseMenu) m_CloseMenu.onClick.AddListener(delegate { OpenCloseMenu(false); m_GameManager.m_AudioController.m_Click_Audio.Play(); });
+
+        if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.RemoveAllListeners();
+        if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.AddListener(CallOnExitFunction);
 
         //if (FreeSpin_Button) FreeSpin_Button.onClick.RemoveAllListeners();
         //if (FreeSpin_Button) FreeSpin_Button.onClick.AddListener(delegate { StartFreeSpins(FreeSpins); });
@@ -176,6 +185,23 @@ public class UIManager : MonoBehaviour
             if (MainPopup_Object) MainPopup_Object.SetActive(false);
             slotManager.CheckBonusGame();
         });
+    }
+
+    internal void DisconnectionPopup(bool isReconnection)
+    {
+        //if(isReconnection)
+        //{
+        //    OpenPopup(ReconnectPopup_Object);
+        //}
+        //else
+        //{
+        //    ClosePopup(ReconnectPopup_Object);
+        //}
+
+        if (!m_GameManager.isExit)
+        {
+            OpenPopup(DisconnectPopup_Object);
+        }
     }
 
     internal void InitialiseUIData(string SupportUrl, string AbtImgUrl, string TermsUrl, string PrivacyUrl, Paylines symbolsText, List<string> Specialsymbols)
