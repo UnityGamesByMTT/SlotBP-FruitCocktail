@@ -37,6 +37,12 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject[] paytableList;
     [SerializeField] internal int CurrentIndex = 0;
 
+    [Header("AnotherDevice Popup")]
+    [SerializeField]
+    private Button CloseAD_Button;
+    [SerializeField]
+    private GameObject ADPopup_Object;
+
     [Header("Settings Popup")]
     [SerializeField]
     private GameObject SettingsPopup_Object;
@@ -68,6 +74,12 @@ public class UIManager : MonoBehaviour
     private bool isMusic = true;
     private bool isSound = true;
 
+    [Header("LowBalance Popup")]
+    [SerializeField]
+    private Button LBExit_Button;
+    [SerializeField]
+    private GameObject LBPopup_Object;
+
     [Header("Disconnection Popup")]
     [SerializeField]
     private Button CloseDisconnect_Button;
@@ -85,6 +97,9 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
+        if (CloseAD_Button) CloseAD_Button.onClick.RemoveAllListeners();
+        if (CloseAD_Button) CloseAD_Button.onClick.AddListener(CallOnExitFunction);
+
         if (SettingsExit_Button) SettingsExit_Button.onClick.RemoveAllListeners();
         if (SettingsExit_Button) SettingsExit_Button.onClick.AddListener(delegate { ClosePopup(SettingsPopup_Object); m_GameManager.m_AudioController.m_Click_Audio.Play(); });
 
@@ -105,6 +120,9 @@ public class UIManager : MonoBehaviour
 
         //if (FreeSpin_Button) FreeSpin_Button.onClick.RemoveAllListeners();
         //if (FreeSpin_Button) FreeSpin_Button.onClick.AddListener(delegate { StartFreeSpins(FreeSpins); });
+
+        if (LBExit_Button) LBExit_Button.onClick.RemoveAllListeners();
+        if (LBExit_Button) LBExit_Button.onClick.AddListener(delegate { ClosePopup(LBPopup_Object); });
 
         if (audioController) audioController.ToggleMute(false);
 
@@ -225,6 +243,16 @@ public class UIManager : MonoBehaviour
         //{
         //    if (SpecialSymbolsText[i]) SpecialSymbolsText[i].text = Specialtext[i];
         //}
+    }
+
+    internal void LowBalPopup()
+    {
+        OpenPopup(LBPopup_Object);
+    }
+
+    internal void ADfunction()
+    {
+        OpenPopup(ADPopup_Object);
     }
 
     private void PopulateSymbolsPayout(Paylines paylines)
