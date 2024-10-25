@@ -483,15 +483,16 @@ public class SlotBehaviour : MonoBehaviour
     //manage the Routine for spinning of the slots
     private IEnumerator TweenRoutine()
     {
-        IsSpinning = true;
 
         if (currentBalance < currentTotalBet && !IsFreeSpin)
         {
             CompareBalance();
             StopAutoSpin();
             yield return new WaitForSeconds(1);
+            ToggleButtonGrp(true);
             yield break;
         }
+        IsSpinning = true;
 
         ToggleButtonGrp(false);
 
@@ -602,20 +603,17 @@ public class SlotBehaviour : MonoBehaviour
 
     private void CompareBalance()
     {
-        Debug.Log("Comparing Balance... ");
-        Debug.Log("Current Balance: " + currentBalance.ToString() + " Current Total Bet: " + currentTotalBet.ToString());
         if (currentBalance < currentTotalBet)
         {
-            Debug.Log("Your Balance Is Low...");
             uiManager.LowBalPopup();
-            if (AutoSpin_Button) AutoSpin_Button.interactable = false;
-            if (SlotStart_Button) SlotStart_Button.interactable = false;
+            //if (AutoSpin_Button) AutoSpin_Button.interactable = false;
+            //if (SlotStart_Button) SlotStart_Button.interactable = false;
         }
-        else
-        {
-            if (AutoSpin_Button) AutoSpin_Button.interactable = true;
-            if (SlotStart_Button) SlotStart_Button.interactable = true;
-        }
+        //else
+        //{
+        //    if (AutoSpin_Button) AutoSpin_Button.interactable = true;
+        //    if (SlotStart_Button) SlotStart_Button.interactable = true;
+        //}
     }
 
     internal void CallCloseSocket()
