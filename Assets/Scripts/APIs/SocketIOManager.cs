@@ -214,7 +214,7 @@ public class SocketIOManager : MonoBehaviour
     private void OnSocketOtherDevice(string data)
     {
         Debug.Log("Received Device Error with data: " + data);
-        //uiManager.ADfunction();
+        uiManager.ADfunction();
     }
 
     private void SendPing()
