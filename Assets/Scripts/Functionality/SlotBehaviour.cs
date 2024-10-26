@@ -140,10 +140,8 @@ public class SlotBehaviour : MonoBehaviour
     private int BetCounter = 0;
 
     static private int Lines = 20;
-    double bet = 0;
-    double balance = 0;
-
-    
+    private double currentBalance = 0;
+    private double currentTotalBet = 0;
 
 
     private void Start()
@@ -299,13 +297,14 @@ public class SlotBehaviour : MonoBehaviour
         if (audioController.m_Player_Listener.enabled) audioController.m_Click_Audio.Play();
 
         BetCounter = SocketManager.initialData.Bets.Count - 1;
+        currentTotalBet = SocketManager.initialData.Bets[BetCounter] * SocketManager.initialData.Lines.Count;
         if (TotalBet_text) TotalBet_text.text = SocketManager.initialData.Bets[BetCounter].ToString();
+        CompareBalance();
     }
 
     private void ChangeBet(bool IncDec)
     {
         if (audioController.m_Player_Listener.enabled) audioController.m_Click_Audio.Play();
-
         if (IncDec)
         {
             if (BetCounter < SocketManager.initialData.Bets.Count - 1)
@@ -320,9 +319,10 @@ public class SlotBehaviour : MonoBehaviour
                 BetCounter--;
             }
         }
-
+        currentTotalBet = SocketManager.initialData.Bets[BetCounter] * SocketManager.initialData.Lines.Count;
         if (TotalBet_text) TotalBet_text.text = (SocketManager.initialData.Bets[BetCounter] * Lines).ToString("f3");
         if (Lines_text) Lines_text.text = (SocketManager.initialData.Bets[BetCounter]).ToString();
+        CompareBalance();
     }
 
 
@@ -344,11 +344,13 @@ public class SlotBehaviour : MonoBehaviour
         if (Balance_text) Balance_text.text = (SocketManager.playerdata.Balance).ToString();
         uiManager.InitialiseUIData(SocketManager.initUIData.AbtLogo.link, SocketManager.initUIData.AbtLogo.logoSprite, SocketManager.initUIData.ToULink, SocketManager.initUIData.PopLink, SocketManager.initUIData.paylines, SocketManager.initUIData.spclSymbolTxt);
         //bonusManager.PopulateBonusPaytable(SocketManager.bonusdata);
-
-        for(int i = 0; i < m_BonusPayText.Count; i++)
+        currentBalance = SocketManager.playerdata.Balance;
+        currentTotalBet = double.Parse(TotalBet_text.text);
+        for (int i = 0; i < m_BonusPayText.Count; i++)
         {
             m_BonusPayText[i].text = SocketManager.bonusdata[i].ToString() + " x";
         }
+        CompareBalance();
     }
 
     //reset the layout after populating the slots
@@ -481,7 +483,17 @@ public class SlotBehaviour : MonoBehaviour
     //manage the Routine for spinning of the slots
     private IEnumerator TweenRoutine()
     {
+
+        if (currentBalance < currentTotalBet && !IsFreeSpin)
+        {
+            CompareBalance();
+            StopAutoSpin();
+            yield return new WaitForSeconds(1);
+            ToggleButtonGrp(true);
+            yield break;
+        }
         IsSpinning = true;
+
         ToggleButtonGrp(false);
 
         if (IsFreeSpin)
@@ -496,22 +508,29 @@ public class SlotBehaviour : MonoBehaviour
             yield return new WaitForSeconds(0.1f);
         }
 
-        bet = 0;
-        balance = 0;
+        double bet = 0;
+        double balance = 0;
         try
         {
             bet = double.Parse(TotalBet_text.text);
+        }
+
+        catch (Exception e)
+        {
+            Debug.Log("Error while conversion " + e.Message);
+        }
+
+        try
+        {
+            balance = double.Parse(Balance_text.text);
         }
         catch (Exception e)
         {
             Debug.Log("Error while conversion " + e.Message);
         }
 
-        balance = SocketManager.playerdata.Balance;
-
+        double initAmount = balance;
         balance = balance - bet;
-
-        if (Balance_text) Balance_text.text = balance.ToString("f3");
 
         SocketManager.AccumulateResult(BetCounter);
         yield return new WaitUntil(() => SocketManager.isResultdone);
@@ -543,6 +562,7 @@ public class SlotBehaviour : MonoBehaviour
 
         //TODO: To Be Uncommented When Move To Publishing
         CheckPayoutLineBackend(SocketManager.resultData.linesToEmit, SocketManager.resultData.FinalsymbolsToEmit, SocketManager.resultData.jackpot);
+        currentBalance = SocketManager.playerdata.Balance;
         KillAllTweens();
         if (TotalWin_text) TotalWin_text.text = SocketManager.playerdata.currentWining.ToString("f3");
         if (Balance_text) Balance_text.text = ((double)SocketManager.playerdata.Balance).ToString("f3");
@@ -550,7 +570,7 @@ public class SlotBehaviour : MonoBehaviour
 
         CheckPopups = true;
 
-        if (SocketManager.resultData.WinAmout >= bet * 15)
+        if (SocketManager.resultData.WinAmout >= currentTotalBet * 15)
         {
             uiManager.PopulateWin(3, (double)SocketManager.resultData.WinAmout);
         }
@@ -561,7 +581,7 @@ public class SlotBehaviour : MonoBehaviour
         }
 
         yield return new WaitUntil(() => !CheckPopups);
-        if (!IsAutoSpin)
+        if (!IsAutoSpin && !IsFreeSpin)
         {
             ToggleButtonGrp(true);
             IsSpinning = false;
@@ -579,6 +599,21 @@ public class SlotBehaviour : MonoBehaviour
             uiManager.StartFreeSpins((int)SocketManager.resultData.freeSpins.count);
             yield break;
         }
+    }
+
+    private void CompareBalance()
+    {
+        if (currentBalance < currentTotalBet)
+        {
+            uiManager.LowBalPopup();
+            //if (AutoSpin_Button) AutoSpin_Button.interactable = false;
+            //if (SlotStart_Button) SlotStart_Button.interactable = false;
+        }
+        //else
+        //{
+        //    if (AutoSpin_Button) AutoSpin_Button.interactable = true;
+        //    if (SlotStart_Button) SlotStart_Button.interactable = true;
+        //}
     }
 
     internal void CallCloseSocket()
@@ -626,10 +661,20 @@ public class SlotBehaviour : MonoBehaviour
         if (SlotStart_Button) SlotStart_Button.interactable = toggle;
         if (MaxBet_Button) MaxBet_Button.interactable = toggle;
         if (AutoSpin_Button) AutoSpin_Button.interactable = toggle;
-        if (LinePlus_Button) LinePlus_Button.interactable = toggle;
-        if (LineMinus_Button) LineMinus_Button.interactable = toggle;
-        if (BetMinus_Button) BetMinus_Button.interactable = toggle;
-        if (BetPlus_Button) BetPlus_Button.interactable = toggle;
+        if(!IsSpinning || !IsAutoSpin || !IsFreeSpin)
+        {
+            if (LinePlus_Button) LinePlus_Button.interactable = true;
+            if (LineMinus_Button) LineMinus_Button.interactable = true;
+            if (BetMinus_Button) BetMinus_Button.interactable = true;
+            if (BetPlus_Button) BetPlus_Button.interactable = true;
+        }
+        else
+        {
+            if (LinePlus_Button) LinePlus_Button.interactable = toggle;
+            if (LineMinus_Button) LineMinus_Button.interactable = toggle;
+            if (BetMinus_Button) BetMinus_Button.interactable = toggle;
+            if (BetPlus_Button) BetPlus_Button.interactable = toggle;
+        }
 
     }
 
