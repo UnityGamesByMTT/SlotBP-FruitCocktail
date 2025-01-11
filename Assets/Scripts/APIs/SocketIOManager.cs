@@ -29,14 +29,13 @@ public class SocketIOManager : MonoBehaviour
     private SocketManager manager;
     [SerializeField] internal UIManager uiManager;
     //HACK: Socket URI
-    protected string TestSocketURI = "https://game-crm-rtp-backend.onrender.com/";
-    //protected string TestSocketURI = "https://6f01c04j-5000.inc1.devtunnels.ms/"; // Gaurav Port
-    //protected string TestSocketURI = "https://7p68wzhv-5000.inc1.devtunnels.ms/"; // Rahul Port
+    protected string TestSocketURI = "http://localhost:5000/";
     protected string SocketURI = null;
 
     [SerializeField]
     private string TestToken;
-    protected string gameID = "SL-FC";//SL-FC
+    //protected string gameID = "SL-FC";//SL-FC
+    protected string gameID = "";
 
     internal bool isLoaded = false;
     internal bool SetInit = false;

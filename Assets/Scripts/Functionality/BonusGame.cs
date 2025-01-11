@@ -85,7 +85,7 @@ public class BonusGame : MonoBehaviour
     [SerializeField] private List<OuterReelItem> m_Exit;
 
     [SerializeField] private GameObject m_StopGameobject;
-    [SerializeField] private GameObject m_BonusWonPopup;
+    [SerializeField] internal GameObject m_BonusWonPopup;
 
     BonusResult m_DefaultStructure;
     BonusResult m_ReceivedStructure;
@@ -125,9 +125,12 @@ public class BonusGame : MonoBehaviour
 
     internal void StartBonusGame()
     {
+        Debug.Log("startbonusGame");
+        m_GameManager.m_Bonus_Start_Object.gameObject.SetActive(false);
         m_GameManager.m_AudioController.m_BG_Audio.Stop();
         m_GameManager.m_AudioController.m_Bonus_BG_Audio.Play();
         bonusGame.SetActive(true);
+        Debug.Log(IsSpinning);
         if (!IsSpinning)
         {
             IsSpinning = true;
@@ -143,6 +146,7 @@ public class BonusGame : MonoBehaviour
 
     internal void StartBonus(int m_count, BonusResult m_BonusData)
     {
+        Debug.Log("bonusgamedataloaded");
         m_ReceivedStructure = m_BonusData;
         N_SpinCount = m_count;
         m_StopGameobject = null;
@@ -154,6 +158,7 @@ public class BonusGame : MonoBehaviour
     //starts the spin process
     private void StartSlots(bool autoSpin = false)
     {
+       
         if (TempList.Count > 0)
         {
             StopGameAnimation();
@@ -189,14 +194,32 @@ public class BonusGame : MonoBehaviour
 
         bonusGame.SetActive(false);
         m_GameManager.m_AudioController.m_Bonus_Audio.Play();
-        m_GameManager.m_PushObject(m_BonusWonPopup);
-
+        // m_GameManager.m_PushObject(m_BonusWonPopup);
+        slotBehaviour.uiManager.MainPopup_Object.SetActive(true);
+        m_BonusWonPopup.gameObject.SetActive(true);
+        IsSpinning = false;
+        Debug.Log("bonusENd");
         yield return new WaitForSeconds(3f);
-
-        StopAutoSpin();
+        slotBehaviour.uiManager.MainPopup_Object.SetActive(false);
+        m_BonusWonPopup.gameObject.SetActive(false) ;
         Reset();
-        slotBehaviour.ToggleButtonGrp(true);
+        
+        if (!slotBehaviour.WasAutoSpinOn)
+        {
+            slotBehaviour.ToggleButtonGrp(true);
+        }
+        else
+        {
+            Invoke("callAutoSpinAgain", 2f);
+        }
+
     }
+
+    void callAutoSpinAgain()
+    {
+        slotBehaviour.callAutoSpinAgain();
+    }
+
 
     private IEnumerator StopAutoSpinCoroutine()
     {
@@ -227,14 +250,14 @@ public class BonusGame : MonoBehaviour
 
         m_GameManager.m_AudioController.m_Spin_Audio.Play();
 
-        Coroutine moveSelector = StartCoroutine(ToggleSelectorAnimation(0.08f, 2));
+        Coroutine moveSelector = StartCoroutine(ToggleSelectorAnimation(0.02f, 2));
 
         yield return new WaitForSeconds(0.1f);
 
         for (int i = 0; i < numberOfSlots; i++)
         {
             InitializeTweening(Slot_Transform[i]);
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0f);
         }
 
         yield return new WaitForSeconds(0.5f);
@@ -254,10 +277,12 @@ public class BonusGame : MonoBehaviour
 
         m_Lives.text = Lives.ToString();
 
-        if(m_ReceivedStructure.outerRingSymbol[N_SpinCount_Begin - 1] != 7)
-        {
-            PlayInnerAnimations();
-        }
+        Debug.Log(N_SpinCount_Begin - 1);
+        //if(m_ReceivedStructure.outerRingSymbol[N_SpinCount_Begin - 1] != 7)
+        //{
+        //    PlayInnerAnimations();
+        //}
+        PlayInnerAnimations();
 
         CheckPayoutLineBackend(resultnum);
 
@@ -304,7 +329,7 @@ public class BonusGame : MonoBehaviour
     {
         StopGameAnimation();
         ResetHighlights();
-        m_GameManager.m_PopObject();
+       
         m_GameManager.m_AudioController.m_Bonus_BG_Audio.Stop();
         m_GameManager.m_AudioController.m_BG_Audio.Play();
     }
@@ -324,6 +349,7 @@ public class BonusGame : MonoBehaviour
             Tempimages[i].slotImages[0].transform.GetChild(0).GetComponent<Image>().sprite = myImages[m_ReceivedStructure.innerMatrix[N_SpinCount_Begin][i]];
             Tempimages[i].slotImages[0].GetComponent<OuterReelItem>().image.GetComponent<ImageAnimation>().textureArray = GetSpriteList(m_ReceivedStructure.innerMatrix[N_SpinCount_Begin][i]).ToList();
         }
+        Debug.Log(N_SpinCount_Begin);
         if(N_SpinCount_Begin < N_SpinCount)
         {
             N_SpinCount_Begin++;
@@ -412,24 +438,19 @@ public class BonusGame : MonoBehaviour
     private void InitializeTweening(Transform slotTransform)
     {
         slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
-        Tweener tweener = slotTransform.DOLocalMoveY(-tweenHeight, 1.2f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0);
+        Tweener tweener = slotTransform.DOLocalMoveY(-tweenHeight, 0.2f).SetLoops(-1, LoopType.Restart).SetEase(Ease.Linear).SetDelay(0);
         tweener.Play();
         alltweens.Add(tweener);
     }
 
     private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index)
     {
-        bool IsRegister = false;
-        yield return alltweens[index].OnStepComplete(delegate { IsRegister = true; });
-        yield return new WaitUntil(() => IsRegister);
-        alltweens[index].Kill();
-        //alltweens[index].Pause();
-        int tweenpos = (reqpos * (IconSizeFactor + m_SpaceFactor)) - (IconSizeFactor + (2 * m_SpaceFactor)) + 20;
-        //alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos - 100 - 40, 0.5f).SetEase(Ease.OutElastic);
-        alltweens[index] = slotTransform.DOLocalMoveY((-tweenpos + (100)) + (m_SpaceFactor > 0 ? m_SpaceFactor / 4 : 0), 1.1f).SetEase(Ease.OutQuad);
-        //yield return new WaitForSeconds(0.2f);
-        yield return alltweens[index].WaitForCompletion();
-        alltweens[index].Kill();
+        alltweens[index].Pause();
+        int tweenpos = (reqpos * IconSizeFactor) - IconSizeFactor;
+        slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
+        alltweens[index] = slotTransform.DOLocalMoveY(-tweenpos + 100, 0.5f).SetEase(Ease.OutElastic);
+        yield return new WaitForSeconds(0.2f);
+       
     }
 
     //HACK: Killing all initialized tweens to stop tweens.
@@ -466,21 +487,22 @@ public class BonusGame : MonoBehaviour
                 }
                 else
                 {
-                    count = 0;
-                    if(count < 4)
-                    {
-                        count++;
-                        yield return new WaitForSeconds(delay * 2f);
-                    }
-                    else
-                    {
-                        yield return new WaitForSeconds(delay * 4f);
-                    }
+                    //count = 0;
+                    //if(count < 4)
+                    //{
+                    //    count++;
+                    //    yield return new WaitForSeconds(delay * 2f);
+                    //}
+                    //else
+                    //{
+                    //    yield return new WaitForSeconds(delay * 4f);
+                    //}
+                    yield return new WaitForSeconds(delay);
                 }
                 Outer_Reel_All_Item[i].selector.SetActive(false);
             }
         }
-        yield return new WaitForSeconds(0.6f);
+        yield return new WaitForSeconds(0.1f);
     }
     #endregion
 }
