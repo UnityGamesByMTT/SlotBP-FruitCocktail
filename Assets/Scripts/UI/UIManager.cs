@@ -29,6 +29,7 @@ public class UIManager : MonoBehaviour
     private GameObject AboutPopup_Object;
     [SerializeField]
     private Button AboutExit_Button;
+    [SerializeField] private Button megaWin_Disable;
 
     [Header("Paytable Popup")]
     [SerializeField] private GameObject PaytablePopup_Object;
@@ -94,6 +95,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Image freeSpinSlider;
     [Header("Game Manager Reference")]
     [SerializeField] private GameManager m_GameManager;
+    private Tween megawin_TweenOne;
+    private Tween megawin_TweenTwo;
+    [SerializeField]
+    private BonusGame bonus_game;
 
     private void Start()
     {
@@ -105,6 +110,9 @@ public class UIManager : MonoBehaviour
 
         if (MusicOn_Object) MusicOn_Object.SetActive(true);
         if (MusicOff_Object) MusicOff_Object.SetActive(false);
+
+        if (megaWin_Disable) megaWin_Disable.onClick.RemoveAllListeners();
+        if (megaWin_Disable) megaWin_Disable.onClick.AddListener(disableMegaWinOnPress);
 
         if (SoundOn_Object) SoundOn_Object.SetActive(true);
         if (SoundOff_Object) SoundOff_Object.SetActive(false);
@@ -171,6 +179,27 @@ public class UIManager : MonoBehaviour
 
     }
 
+    private void disableMegaWinOnPress()
+    {
+        Debug.Log("PressedDisable");
+        megawin_TweenOne?.Kill();
+        megawin_TweenTwo?.Kill();
+        MainPopup_Object.SetActive(false);
+        megaWIn.SetActive(false);
+        slotManager.CheckBonusGame();
+        
+    }
+
+    internal void disableMwinPopupReset()
+    {
+        slotManager.CheckPopups = false;
+        if (slotManager.WasAutoSpinOn && !slotManager.SocketManager.resultData.isBonus)
+        {
+            slotManager.callAutoSpinAgain();
+        }
+
+    }
+
     private void FreeSpinProcess()
     {
 
@@ -192,12 +221,12 @@ public class UIManager : MonoBehaviour
         //if (WinPopup_Object) WinPopup_Object.SetActive(true);
         if (MainPopup_Object) MainPopup_Object.SetActive(true);
 
-        DOTween.To(() => initAmount, (val) => initAmount = val, amount, 2f).OnUpdate(() =>
+        megawin_TweenOne = DOTween.To(() => initAmount, (val) => initAmount = val, amount, 1f).OnUpdate(() =>
         {
             if (megaWInText) megaWInText.text = initAmount.ToString("f3");
         });
 
-        DOVirtual.DelayedCall(6f, () =>
+        megawin_TweenTwo = DOVirtual.DelayedCall(2f, () =>
         {
             if (megaWIn) megaWIn.SetActive(false);
             if (MainPopup_Object) MainPopup_Object.SetActive(false);
@@ -264,15 +293,15 @@ public class UIManager : MonoBehaviour
             {
                 if (paylines.symbols[i].Multiplier[0][0] != 0)
                 {
-                    text += string.Concat("<color=#F8D229>", "5x - " + paylines.symbols[i].Multiplier[0][0], "</color>");
+                    text += string.Concat("<color=#F8D229>", "5x - " + paylines.symbols[i].Multiplier[0][0] +"x", "</color>");
                 }
                 if (paylines.symbols[i].Multiplier[1][0] != 0)
                 {
-                    text += string.Concat("<color=#F8D229>", "\n4x - " + paylines.symbols[i].Multiplier[1][0], "</color>");
+                    text += string.Concat("<color=#F8D229>", "\n4x - " + paylines.symbols[i].Multiplier[1][0] + "x", "</color>");
                 }
                 if (paylines.symbols[i].Multiplier[2][0] != 0)
                 {
-                    text += string.Concat("<color=#F8D229>", "\n3x - " + paylines.symbols[i].Multiplier[2][0], "</color>");
+                    text += string.Concat("<color=#F8D229>", "\n3x - " + paylines.symbols[i].Multiplier[2][0] + "x", "</color>");
                 }
             }
             else
