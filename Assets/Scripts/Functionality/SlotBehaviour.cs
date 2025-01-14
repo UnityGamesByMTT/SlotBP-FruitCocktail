@@ -639,7 +639,7 @@ public class SlotBehaviour : MonoBehaviour
 
         if (IsTurboOn || IsFreeSpin)
         {
-
+            StopSpinToggle = true;
             yield return new WaitForSeconds(0.1f);
         }
         else
@@ -886,19 +886,22 @@ public class SlotBehaviour : MonoBehaviour
             //        }
             //    }
             //}
-
+          
             for (int i = 0; i < points_AnimString.Count; i++)
             {
                 points_anim = points_AnimString[i]?.Split(',')?.Select(Int32.Parse)?.ToList();
-
+                
                 for (int k = 0; k < points_anim.Count; k++)
                 {
+                    
                     if (points_anim[k] >= 10)
                     {
                         StartGameAnimation(Tempimages[(points_anim[k] / 10) % 10].slotImages[points_anim[k] % 10].gameObject);
+                        Debug.Log((points_anim[k] / 10) % 10 + "  "+ points_anim[k] % 10);
                     }
                     else
                     {
+                        Debug.Log("0   " + k);
                         StartGameAnimation(Tempimages[0].slotImages[points_anim[k]].gameObject);
                     }
                 }
