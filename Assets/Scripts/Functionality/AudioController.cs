@@ -87,15 +87,15 @@ public class AudioController : MonoBehaviour
 
     private void OnApplicationFocus(bool focus)
     {
-        if (!focus)
-        {
-            m_Player_Listener.enabled = false;
-        }
-        else
-        {
-            m_Player_Listener.enabled = true;
+        //if (!focus)
+        //{
+        //    m_Player_Listener.enabled = false;
+        //}
+        //else
+        //{
+        //    m_Player_Listener.enabled = true;
 
-        }
+        //}
     }
 
     internal void ToggleMute(bool toggle, string type = "all")
