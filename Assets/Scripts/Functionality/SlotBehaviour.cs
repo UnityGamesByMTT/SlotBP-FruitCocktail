@@ -280,9 +280,10 @@ public class SlotBehaviour : MonoBehaviour
 
     private void StopAutoSpin()
     {
-        WasAutoSpinOn = false;
-        if (IsAutoSpin)
+        
+        if (WasAutoSpinOn)
         {
+            WasAutoSpinOn = false;
             IsAutoSpin = false;
             if (AutoSpinStop_Button) AutoSpinStop_Button.gameObject.SetActive(false);
             if (AutoSpin_Button) AutoSpin_Button.gameObject.SetActive(true);
@@ -376,27 +377,30 @@ public class SlotBehaviour : MonoBehaviour
 
     private void ChangeBet(bool IncDec)
     {
-        if (audioController.m_Player_Listener.enabled) audioController.m_Click_Audio.Play();
-        if (IncDec)
+        if (!AutoSpinStop_Button.gameObject.activeSelf)
         {
-            BetCounter++;
-            if (BetCounter > SocketManager.initialData.Bets.Count - 1)
+            if (audioController.m_Player_Listener.enabled) audioController.m_Click_Audio.Play();
+            if (IncDec)
             {
-                BetCounter = 0;  
+                BetCounter++;
+                if (BetCounter > SocketManager.initialData.Bets.Count - 1)
+                {
+                    BetCounter = 0;
+                }
             }
-        }
-        else
-        {
-            BetCounter--;
-            if (BetCounter < 0)
+            else
             {
-                BetCounter = SocketManager.initialData.Bets.Count - 1;
+                BetCounter--;
+                if (BetCounter < 0)
+                {
+                    BetCounter = SocketManager.initialData.Bets.Count - 1;
+                }
             }
+            currentTotalBet = SocketManager.initialData.Bets[BetCounter] * SocketManager.initialData.Lines.Count;
+            if (TotalBet_text) TotalBet_text.text = (SocketManager.initialData.Bets[BetCounter] * Lines).ToString("f3");
+            if (Lines_text) Lines_text.text = (SocketManager.initialData.Bets[BetCounter]).ToString();
+            CompareBalance();
         }
-        currentTotalBet = SocketManager.initialData.Bets[BetCounter] * SocketManager.initialData.Lines.Count;
-        if (TotalBet_text) TotalBet_text.text = (SocketManager.initialData.Bets[BetCounter] * Lines).ToString("f3");
-        if (Lines_text) Lines_text.text = (SocketManager.initialData.Bets[BetCounter]).ToString();
-        CompareBalance();
     }
 
 
@@ -760,9 +764,13 @@ public class SlotBehaviour : MonoBehaviour
             }
 
             Debug.Log("isbonus");
-            m_GameManager.m_AudioController.m_Bonus_Audio.Play();
-            uiManager.MainPopup_Object.SetActive(true);
-            m_GameManager.m_Bonus_Start_Object.SetActive(true);
+            DOVirtual.DelayedCall(1f, () =>
+            {
+                m_GameManager.m_AudioController.m_Bonus_Audio.Play();
+                uiManager.MainPopup_Object.SetActive(true);
+                m_GameManager.m_Bonus_Start_Object.SetActive(true);
+            });
+           
            // m_GameManager.m_PushObject(m_GameManager.m_Bonus_Start_Object);
             bonusManager.StartBonus(SocketManager.resultData.BonusResult.winings.Count, SocketManager.resultData.BonusResult);
             Invoke("startbonusautomatically", 2f);
