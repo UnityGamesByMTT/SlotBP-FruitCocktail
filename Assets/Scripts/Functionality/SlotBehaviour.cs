@@ -152,6 +152,7 @@ public class SlotBehaviour : MonoBehaviour
     static private int Lines = 20;
     private double currentBalance = 0;
     private double currentTotalBet = 0;
+    private float SpinDelay = 0.2f;
 
     [SerializeField]
     Sprite[] TurboToggleSprites;
@@ -419,7 +420,7 @@ public class SlotBehaviour : MonoBehaviour
         if (TotalBet_text) TotalBet_text.text = (SocketManager.initialData.Bets[BetCounter] * Lines).ToString("f3");
         if (Lines_text) Lines_text.text = (SocketManager.initialData.Bets[BetCounter]).ToString();
         if (TotalWin_text) TotalWin_text.text = 0.ToString("f3");
-        if (Balance_text) Balance_text.text = (SocketManager.playerdata.Balance).ToString();
+        if (Balance_text) Balance_text.text = (SocketManager.playerdata.Balance).ToString("f3");
         uiManager.InitialiseUIData(SocketManager.initUIData.AbtLogo.link, SocketManager.initUIData.AbtLogo.logoSprite, SocketManager.initUIData.ToULink, SocketManager.initUIData.PopLink, SocketManager.initUIData.paylines, SocketManager.initUIData.spclSymbolTxt);
         //bonusManager.PopulateBonusPaytable(SocketManager.bonusdata);
         currentBalance = SocketManager.playerdata.Balance;
@@ -673,6 +674,14 @@ public class SlotBehaviour : MonoBehaviour
         CheckPayoutLineBackend(SocketManager.resultData.linesToEmit, SocketManager.resultData.FinalsymbolsToEmit, SocketManager.resultData.jackpot);
         currentBalance = SocketManager.playerdata.Balance;
         KillAllTweens();
+        if (SocketManager.playerdata.currentWining > 0)
+        {
+            SpinDelay = 2f;
+        }
+        else
+        {
+            SpinDelay = 0.5f;
+        }
         if (TotalWin_text) TotalWin_text.text = SocketManager.playerdata.currentWining.ToString("f3");
         if (Balance_text) Balance_text.text = ((double)SocketManager.playerdata.Balance).ToString("f3");
 
@@ -701,7 +710,7 @@ public class SlotBehaviour : MonoBehaviour
         }
         else
         {
-            yield return new WaitForSeconds(0.8f);
+            yield return new WaitForSeconds(SpinDelay);
             IsSpinning = false;
         }
 
