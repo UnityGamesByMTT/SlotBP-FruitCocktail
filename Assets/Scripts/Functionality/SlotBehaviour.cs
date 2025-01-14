@@ -672,7 +672,7 @@ public class SlotBehaviour : MonoBehaviour
         if (TotalWin_text) TotalWin_text.text = SocketManager.playerdata.currentWining.ToString("f3");
         if (Balance_text) Balance_text.text = ((double)SocketManager.playerdata.Balance).ToString("f3");
 
-        
+        Debug.Log("checking popups");
         CheckPopups = true;
 
         if (SocketManager.resultData.WinAmout >= currentTotalBet * 15)
@@ -681,10 +681,10 @@ public class SlotBehaviour : MonoBehaviour
         }
         else
         {
-            yield return new WaitForSeconds(0.8f);
+           // yield return new WaitForSeconds(0.8f);
             CheckBonusGame();
         }
-
+       
         yield return new WaitUntil(() => !CheckPopups);
         if (!IsAutoSpin && !IsFreeSpin)
         {

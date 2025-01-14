@@ -34,8 +34,8 @@ public class SocketIOManager : MonoBehaviour
 
     [SerializeField]
     private string TestToken;
-    //protected string gameID = "SL-FC";//SL-FC
-    protected string gameID = "";
+    protected string gameID = "SL-FC";//SL-FC
+    //protected string gameID = "";
 
     internal bool isLoaded = false;
     internal bool SetInit = false;
