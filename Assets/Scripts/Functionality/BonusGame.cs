@@ -199,13 +199,14 @@ public class BonusGame : MonoBehaviour
         m_BonusWonPopup.gameObject.SetActive(true);
         IsSpinning = false;
         Debug.Log("bonusENd");
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(2f);
         slotBehaviour.uiManager.MainPopup_Object.SetActive(false);
         m_BonusWonPopup.gameObject.SetActive(false) ;
         Reset();
-        
+        Debug.Log(slotBehaviour.WasAutoSpinOn);
         if (!slotBehaviour.WasAutoSpinOn)
         {
+            Debug.Log("asautospinwasfalse");
             slotBehaviour.ToggleButtonGrp(true);
         }
         else
@@ -277,7 +278,7 @@ public class BonusGame : MonoBehaviour
 
         m_Lives.text = Lives.ToString();
 
-        Debug.Log(N_SpinCount_Begin - 1);
+       // Debug.Log(N_SpinCount_Begin - 1);
         //if(m_ReceivedStructure.outerRingSymbol[N_SpinCount_Begin - 1] != 7)
         //{
         //    PlayInnerAnimations();
@@ -471,7 +472,7 @@ public class BonusGame : MonoBehaviour
         ResetHighlights();
         for (int j = 0; j < noOfRotation + 1; j++)
         {
-            for(int i = Outer_Reel_All_Item.Count - 1; i > 0; i--)
+            for(int i = Outer_Reel_All_Item.Count - 1; i >= 0; i--)
             {
                 Outer_Reel_All_Item[i].selector.SetActive(true);
                 if (j == noOfRotation && Outer_Reel_All_Item[i].gameObject == m_StopGameobject)

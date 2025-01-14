@@ -185,14 +185,15 @@ public class UIManager : MonoBehaviour
         megawin_TweenOne?.Kill();
         megawin_TweenTwo?.Kill();
         MainPopup_Object.SetActive(false);
-        bonus_game.m_BonusWonPopup.gameObject.SetActive(false);
-        Invoke("disableMwinPopupReset", 2f);
+        megaWIn.SetActive(false);
+        slotManager.CheckBonusGame();
+        
     }
 
     internal void disableMwinPopupReset()
     {
         slotManager.CheckPopups = false;
-        if (slotManager.WasAutoSpinOn)
+        if (slotManager.WasAutoSpinOn && !slotManager.SocketManager.resultData.isBonus)
         {
             slotManager.callAutoSpinAgain();
         }
@@ -220,12 +221,12 @@ public class UIManager : MonoBehaviour
         //if (WinPopup_Object) WinPopup_Object.SetActive(true);
         if (MainPopup_Object) MainPopup_Object.SetActive(true);
 
-        megawin_TweenOne = DOTween.To(() => initAmount, (val) => initAmount = val, amount, 2f).OnUpdate(() =>
+        megawin_TweenOne = DOTween.To(() => initAmount, (val) => initAmount = val, amount, 1f).OnUpdate(() =>
         {
             if (megaWInText) megaWInText.text = initAmount.ToString("f3");
         });
 
-        megawin_TweenTwo = DOVirtual.DelayedCall(6f, () =>
+        megawin_TweenTwo = DOVirtual.DelayedCall(2f, () =>
         {
             if (megaWIn) megaWIn.SetActive(false);
             if (MainPopup_Object) MainPopup_Object.SetActive(false);
@@ -292,15 +293,15 @@ public class UIManager : MonoBehaviour
             {
                 if (paylines.symbols[i].Multiplier[0][0] != 0)
                 {
-                    text += string.Concat("<color=#F8D229>", "5x - " + paylines.symbols[i].Multiplier[0][0], "</color>");
+                    text += string.Concat("<color=#F8D229>", "5x - " + paylines.symbols[i].Multiplier[0][0] +"x", "</color>");
                 }
                 if (paylines.symbols[i].Multiplier[1][0] != 0)
                 {
-                    text += string.Concat("<color=#F8D229>", "\n4x - " + paylines.symbols[i].Multiplier[1][0], "</color>");
+                    text += string.Concat("<color=#F8D229>", "\n4x - " + paylines.symbols[i].Multiplier[1][0] + "x", "</color>");
                 }
                 if (paylines.symbols[i].Multiplier[2][0] != 0)
                 {
-                    text += string.Concat("<color=#F8D229>", "\n3x - " + paylines.symbols[i].Multiplier[2][0], "</color>");
+                    text += string.Concat("<color=#F8D229>", "\n3x - " + paylines.symbols[i].Multiplier[2][0] + "x", "</color>");
                 }
             }
             else

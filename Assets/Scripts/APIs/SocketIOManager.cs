@@ -458,7 +458,7 @@ public class GameData
     public List<List<string>> symbolsToEmit { get; set; }
     public double WinAmout { get; set; }
     public FreeSpins freeSpins { get; set; }
-    public int jackpot { get; set; }
+    public double jackpot { get; set; }
     public bool isBonus { get; set; }
     public int BonusStopIndex { get; set; }
 
