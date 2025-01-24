@@ -293,6 +293,19 @@ public class SlotBehaviour : MonoBehaviour
 
     }
 
+    private void StopAutoSpinLowBalance()
+    {
+
+        
+            WasAutoSpinOn = false;
+            IsAutoSpin = false;
+            if (AutoSpinStop_Button) AutoSpinStop_Button.gameObject.SetActive(false);
+            if (AutoSpin_Button) AutoSpin_Button.gameObject.SetActive(true);
+            StartCoroutine(StopAutoSpinCoroutine());
+        
+
+    }
+
     private IEnumerator AutoSpinCoroutine()
     {
         while (IsAutoSpin)
@@ -435,6 +448,7 @@ public class SlotBehaviour : MonoBehaviour
     //reset the layout after populating the slots
     internal void LayoutReset(int number)
     {
+        Debug.Log("layout_Reset");
         if (Slot_Elements[number]) Slot_Elements[number].ignoreLayout = true;
         if (SlotStart_Button) SlotStart_Button.interactable = true;
     }
@@ -563,7 +577,8 @@ public class SlotBehaviour : MonoBehaviour
     //manage the Routine for spinning of the slots
     private IEnumerator TweenRoutine()
     {
-
+        Debug.Log("autoSpinOn");
+        
         if (currentBalance < currentTotalBet && !IsFreeSpin)
         {
             CompareBalance();
@@ -628,9 +643,9 @@ public class SlotBehaviour : MonoBehaviour
             WasAutoSpinOn = true;
         }
 
-        Debug.Log(string.Concat("<color=green><b>", string.Join(", ", SocketManager.resultData.ResultReel[0]), "</b></color>"));
-        Debug.Log(string.Concat("<color=green><b>", string.Join(", ", SocketManager.resultData.ResultReel[1]), "</b></color>"));
-        Debug.Log(string.Concat("<color=green><b>", string.Join(", ", SocketManager.resultData.ResultReel[2]), "</b></color>"));
+        //Debug.Log(string.Concat("<color=green><b>", string.Join(", ", SocketManager.resultData.ResultReel[0]), "</b></color>"));
+        //Debug.Log(string.Concat("<color=green><b>", string.Join(", ", SocketManager.resultData.ResultReel[1]), "</b></color>"));
+        //Debug.Log(string.Concat("<color=green><b>", string.Join(", ", SocketManager.resultData.ResultReel[2]), "</b></color>"));
 
         //HACK: Image Populate Loop For Testing
         for (int i = 0; i < Tempimages.Count; i++)
@@ -685,7 +700,7 @@ public class SlotBehaviour : MonoBehaviour
         if (TotalWin_text) TotalWin_text.text = SocketManager.playerdata.currentWining.ToString("f3");
         if (Balance_text) Balance_text.text = ((double)SocketManager.playerdata.Balance).ToString("f3");
 
-        Debug.Log("checking popups");
+        
         CheckPopups = true;
 
         if (SocketManager.resultData.WinAmout >= currentTotalBet * 15)
@@ -699,9 +714,10 @@ public class SlotBehaviour : MonoBehaviour
         }
        
         yield return new WaitUntil(() => !CheckPopups);
+        Debug.Log(SocketManager.resultData.isBonus);
         if (!IsAutoSpin && !IsFreeSpin)
         {
-            Debug.Log("calledEarly");
+            
             if (!SocketManager.resultData.isBonus)
             {
                 ToggleButtonGrp(true);
@@ -727,6 +743,10 @@ public class SlotBehaviour : MonoBehaviour
     {
         if (currentBalance < currentTotalBet)
         {
+            if (IsAutoSpin)
+            {
+                StopAutoSpinLowBalance();
+            }
             uiManager.LowBalPopup();
             //if (AutoSpin_Button) AutoSpin_Button.interactable = false;
             //if (SlotStart_Button) SlotStart_Button.interactable = false;
@@ -761,18 +781,11 @@ public class SlotBehaviour : MonoBehaviour
         {
             if (WasAutoSpinOn)
             {
-                
-                  
-                    IsAutoSpin = false;
-                    StopCoroutine(AutoSpinCoroutine());
-                    Debug.Log("callBoxRoutine");
-                   
-
-                
-
+               IsAutoSpin = false;
+               StopCoroutine(AutoSpinCoroutine());                
             }
 
-            Debug.Log("isbonus");
+            
             DOVirtual.DelayedCall(1f, () =>
             {
                 m_GameManager.m_AudioController.m_Bonus_Audio.Play();
@@ -810,9 +823,10 @@ public class SlotBehaviour : MonoBehaviour
 
     internal void callAutoSpinAgain()
     {
+        Debug.Log(AutoSpinStop_Button.gameObject.activeSelf);
         if (AutoSpinStop_Button.gameObject.activeSelf)
         {
-            Debug.Log("callAutoSpinAgain");
+            
             AutoSpin();
         }
     }
@@ -821,7 +835,7 @@ public class SlotBehaviour : MonoBehaviour
 
     internal void ToggleButtonGrp(bool toggle)
     {
-        Debug.Log("afterBonus");
+       
         if (SlotStart_Button) SlotStart_Button.interactable = toggle;
         if (MaxBet_Button) MaxBet_Button.interactable = toggle;
         if (AutoSpin_Button) AutoSpin_Button.interactable = toggle;
@@ -914,11 +928,11 @@ public class SlotBehaviour : MonoBehaviour
                     if (points_anim[k] >= 10)
                     {
                         StartGameAnimation(Tempimages[(points_anim[k] / 10) % 10].slotImages[points_anim[k] % 10].gameObject);
-                        Debug.Log((points_anim[k] / 10) % 10 + "  "+ points_anim[k] % 10);
+                        //Debug.Log((points_anim[k] / 10) % 10 + "  "+ points_anim[k] % 10);
                     }
                     else
                     {
-                        Debug.Log("0   " + k);
+                        //Debug.Log("0   " + k);
                         StartGameAnimation(Tempimages[0].slotImages[points_anim[k]].gameObject);
                     }
                 }

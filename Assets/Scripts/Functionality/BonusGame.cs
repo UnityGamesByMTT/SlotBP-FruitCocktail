@@ -211,6 +211,7 @@ public class BonusGame : MonoBehaviour
         }
         else
         {
+            Debug.Log("invokeautospinBonus");
             Invoke("callAutoSpinAgain", 2f);
         }
 
