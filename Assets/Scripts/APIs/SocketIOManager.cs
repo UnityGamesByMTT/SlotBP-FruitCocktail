@@ -278,8 +278,8 @@ public class SocketIOManager : MonoBehaviour
                         List<string> LinesString = ConvertListListIntToListString(initialData.Lines);
                         List<string> InitialReels = ConvertListOfListsToStrings(initialData.Reel);
                         InitialReels = RemoveQuotes(InitialReels);
-                        Debug.Log(string.Concat("<color=cyan><b>", string.Join(",", LinesString), "</b></color>"));
-                        Debug.Log(string.Concat("<color=cyan><b>", string.Join(",", InitialReels), "</b></color>"));
+                        //Debug.Log(string.Concat("<color=cyan><b>", string.Join(",", LinesString), "</b></color>"));
+                        //Debug.Log(string.Concat("<color=cyan><b>", string.Join(",", InitialReels), "</b></color>"));
 
                         PopulateSlotSocket(LinesString);
                         SetInit = true;
