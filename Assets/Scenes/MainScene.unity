@@ -6949,6 +6949,7 @@ MonoBehaviour:
   freeSpinSlider: {fileID: 730464863}
   m_GameManager: {fileID: 384409380}
   bonus_game: {fileID: 1070844480}
+  socketManager: {fileID: 500036492}
 --- !u!1 &384409379
 GameObject:
   m_ObjectHideFlags: 0
