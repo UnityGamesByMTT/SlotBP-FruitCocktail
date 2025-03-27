@@ -334,7 +334,7 @@ public class UIManager : MonoBehaviour
     internal void CallOnExitFunction()
     {
         slotManager.CallCloseSocket();
-        Application.ExternalCall("window.parent.postMessage", "onExit", "*");
+        //Application.ExternalCall("window.parent.postMessage", "onExit", "*");
     }
 
     private void OpenPopup(GameObject Popup)
