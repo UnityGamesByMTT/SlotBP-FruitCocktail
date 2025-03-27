@@ -250,10 +250,7 @@ public class SocketIOManager : MonoBehaviour
 
     internal void CloseSocket()
     {
-        if (this.manager != null)
-        {
-            this.manager.Close();
-        }
+        SendDataWithNamespace("EXIT");
     }
 
     private void ParseResponse(string jsonObject)
