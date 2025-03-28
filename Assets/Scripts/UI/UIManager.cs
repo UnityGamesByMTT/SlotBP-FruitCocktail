@@ -99,6 +99,8 @@ public class UIManager : MonoBehaviour
     private Tween megawin_TweenTwo;
     [SerializeField]
     private BonusGame bonus_game;
+    [SerializeField]
+    SocketIOManager socketManager;
 
     private void Start()
     {
@@ -124,7 +126,7 @@ public class UIManager : MonoBehaviour
         if (m_CloseMenu) m_CloseMenu.onClick.AddListener(delegate { OpenCloseMenu(false); m_GameManager.m_AudioController.m_Click_Audio.Play(); });
 
         if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.RemoveAllListeners();
-        if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.AddListener(CallOnExitFunction);
+        if (CloseDisconnect_Button) CloseDisconnect_Button.onClick.AddListener(delegate { CallOnExitFunction(); socketManager.ReactNativeCallOnFailedToConnect(); });
 
         //if (FreeSpin_Button) FreeSpin_Button.onClick.RemoveAllListeners();
         //if (FreeSpin_Button) FreeSpin_Button.onClick.AddListener(delegate { StartFreeSpins(FreeSpins); });
@@ -332,7 +334,7 @@ public class UIManager : MonoBehaviour
     internal void CallOnExitFunction()
     {
         slotManager.CallCloseSocket();
-        Application.ExternalCall("window.parent.postMessage", "onExit", "*");
+        //Application.ExternalCall("window.parent.postMessage", "onExit", "*");
     }
 
     private void OpenPopup(GameObject Popup)
